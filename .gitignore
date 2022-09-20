@@ -4,3 +4,5 @@
 .Ruserdata
 TeleACT-Aging_Joel_9-16-22.csv
 .DS_Store
+.Rdata
+.httr-oauth
