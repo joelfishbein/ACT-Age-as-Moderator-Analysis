@@ -70,33 +70,12 @@ data.long <- data.wide %>%
 
 ```
 
-# Basic desciptives
 
-```{r}
-data.wide %>%
-  skimr::skim()
-```
-
-# Examine age
+# Write files
 
 ```{r}
 
-data.wide %>%
-  ggplot(aes(x = age)) +
-  ggdist::stat_dots()
-
+write_csv(x = data.long, here('Generated Datasets', 'data_long.rds'))
+write_csv(x = data.wide, here('Generated Datasets', 'data_wide.rds'))
 ```
-
-# Spaghetti plots
-
-```{r}
-
-data.long %>%
-  ggplot(aes(x = timepoint, y = value)) +
-   geom_point(alpha = .1, aes(color = age)) +
-  ggplot2::stat_summary(size = 2, geom = 'point',fun = 'mean') +
-
-  facet_wrap(vars(instrument), scales = 'free')
-```
-
 
