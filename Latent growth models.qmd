@@ -183,6 +183,9 @@ BPIseverity.piecewise.moderated.fit <- fitPiecewiseModeratedModel('BPIseverity')
 
 summary(BPIseverity.piecewise.moderated.fit, fit.measures = TRUE)
 
+write_rds(x = BPIseverity.piecewise.moderated.fit, 
+          file = here('Model fits', 'BPIseverity.piecewise.moderated.fit'))
+
 ```
 
 ## Pain interference
@@ -260,4 +263,13 @@ anova(CPAQ.linear.fit, CPAQ.piecewise.fit)
 
 ```
 
+### Moderated piecewise
+
+```{r}
+
+CPAQ.piecewise.moderated.fit <- fitPiecewiseModeratedModel('CPAQ')
+
+summary(CPAQ.piecewise.moderated.fit, fit.measures = TRUE)
+
+```
 

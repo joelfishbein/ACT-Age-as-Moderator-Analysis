@@ -1,0 +1,59 @@
+---
+title: "Visualize piecewise slopes by age"
+format: html
+editor: visual
+---
+
+# read in data
+
+```{r}
+library(lavaan)
+library(tidyverse)
+library(here)
+BPIseverity.piecewise.moderated.fit <- read_rds(file = here('Model fits', 'BPIseverity.piecewise.moderated.fit'))
+IDS_and_ages <- read_csv(here('Generated Datasets', 'data_wide.rds')) %>%
+  select(ID, age)
+```
+
+# combine data
+
+```{r}
+
+participant_predicted_values.wide <- bind_cols(IDS_and_ages, lavaan::predict(BPIseverity.piecewise.moderated.fit)) %>%
+  rename(`BPI Severity Intercept` = myIntercept,
+         `BPI Severity During Intervention Per Timepoint Change` = slope1,
+         `BPI Severity FU Per Timepoint Change` = slope2) 
+
+participant_predicted_values.long <-
+participant_predicted_values.wide %>%
+  pivot_longer(cols = `BPI Severity Intercept`:`BPI Severity FU Per Timepoint Change`)
+
+
+```
+
+# plot BPI severity
+
+```{r}
+
+participant_predicted_values  %>%
+  filter(name %in% c( "BPI Severity During Intervention Per Timepoint Change", "BPI Severity FU Per Timepoint Change" )) %>%
+  
+  ggplot(aes(x = age, y = value, color = age)) +
+  geom_point() +
+  stat_smooth(method = "lm", se = FALSE, color = 'red') +
+  facet_wrap(vars(name))
+
+```
+
+
+## multivariate outlier detection
+
+Per https://online.stat.psu.edu/stat462/node/173/, none of these values is problematic (problems occur at d > .5)
+
+```{r}
+
+fit_for_outliers <- lm(`BPI Severity During Intervention Per Timepoint Change` ~ age, data = participant_predicted_values.wide)
+
+plot(cooks.distance(fit_for_outliers))
+
+```
