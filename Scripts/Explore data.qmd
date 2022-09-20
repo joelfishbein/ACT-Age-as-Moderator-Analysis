@@ -10,6 +10,7 @@ editor: visual
 ```{r}
 library(here)
 library(tidyverse)
+library(ggdist)
 
 data.allvars <- read_csv(here('TeleACT-Aging_Joel_9-16-22.csv'))
 
@@ -68,3 +69,34 @@ data.long <- data.wide %>%
 
 
 ```
+
+# Basic desciptives
+
+```{r}
+data.wide %>%
+  skimr::skim()
+```
+
+# Examine age
+
+```{r}
+
+data.wide %>%
+  ggplot(aes(x = age)) +
+  ggdist::stat_dots()
+
+```
+
+# Spaghetti plots
+
+```{r}
+
+data.long %>%
+  ggplot(aes(x = timepoint, y = value)) +
+   geom_point(alpha = .1, aes(color = age)) +
+  ggplot2::stat_summary(size = 2, geom = 'point',fun = 'mean') +
+
+  facet_wrap(vars(instrument), scales = 'free')
+```
+
+
