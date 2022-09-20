@@ -1,0 +1,263 @@
+---
+title: "Latent growth models"
+format: html
+editor: visual
+---
+
+# Read in data
+
+```{r}
+library(lavaan)
+library(tidyverse)
+data.wide <- read_csv(here('Generated Datasets', 'data_wide.rds'))
+```
+# Generic model functions
+
+```{r}
+
+linear.model.generic <- '
+
+myIntercept =~ 1*Var.1 +
+              1*Var.2 +
+              1*Var.3 +
+              1*Var.4 +
+              1*Var.5
+              
+linearSlope =~ 0*Var.1 +
+              1*Var.2 +
+              2*Var.3 +
+              3*Var.4 +
+              4*Var.5
+'
+```
+
+```{r}
+piecewise.model.generic <- '
+
+myIntercept =~ 1*Var.1 +
+              1*Var.2 +
+              1*Var.3 +
+              1*Var.4 +
+              1*Var.5
+              
+slope1 =~ 0*Var.1 +
+              1*Var.2 +
+              2*Var.3 +
+              2*Var.4 +
+              2*Var.5
+              
+slope2 =~ 0*Var.1 +
+              0*Var.2 +
+              0*Var.3 +
+              1*Var.4 +
+              2*Var.5
+              
+'
+
+```
+
+```{r}
+
+piecewise.model.moderated.generic <- '
+
+myIntercept =~ 1*Var.1 +
+              1*Var.2 +
+              1*Var.3 +
+              1*Var.4 +
+              1*Var.5
+              
+slope1 =~ 0*Var.1 +
+              1*Var.2 +
+              2*Var.3 +
+              2*Var.4 +
+              2*Var.5
+              
+slope2 =~ 0*Var.1 +
+              0*Var.2 +
+              0*Var.3 +
+              1*Var.4 +
+              2*Var.5
+              
+myIntercept ~ ageMeanCentered
+slope1 ~ ageMeanCentered
+slope2 ~ ageMeanCentered
+              
+'
+
+```
+
+
+```{r}
+
+fitLinearModel <- function(instrumentName){
+  # input instrumentName as argument
+  
+  
+  model <- str_replace_all(linear.model.generic, c("Var" = instrumentName))
+  
+  fit <- lavaan::growth(model = model,
+                        data = data.wide,
+                        missing = 'FIML')
+  
+  return(fit)
+  
+}
+
+```
+
+```{r}
+
+fitPiecewiseModel <- function(instrumentName){
+  # input instrumentName as argument
+  
+  
+  model <- str_replace_all(piecewise.model.generic, c("Var" = instrumentName))
+  
+  fit <- lavaan::growth(model = model,
+                        data = data.wide,
+                        missing = 'FIML')
+  
+  return(fit)
+  
+}
+
+```
+
+```{r}
+
+fitPiecewiseModeratedModel <- function(instrumentName){
+  # input instrumentName as argument
+  
+  
+  model <- str_replace_all(piecewise.model.moderated.generic, c("Var" = instrumentName))
+  
+  fit <- lavaan::growth(model = model,
+                        data = data.wide,
+                        missing = 'FIML')
+  
+  return(fit)
+  
+}
+
+```
+
+
+
+
+# Fit models to data
+## Pain severity
+
+### Linear
+
+```{r}
+
+BPIseverity.linear.fit <- fitLinearModel('BPIseverity')
+
+summary(BPIseverity.linear.fit, fit.measures = TRUE)
+
+```
+
+### Piecewise
+
+```{r}
+
+BPIseverity.piecewise.fit <- fitPiecewiseModel('BPIseverity')
+
+summary(BPIseverity.piecewise.fit, fit.measures = TRUE)
+
+```
+
+
+### Model comparison
+
+```{r}
+anova(BPIseverity.linear.fit, BPIseverity.piecewise.fit)
+
+```
+
+### Moderated piecewise
+
+```{r}
+
+BPIseverity.piecewise.moderated.fit <- fitPiecewiseModeratedModel('BPIseverity')
+
+summary(BPIseverity.piecewise.moderated.fit, fit.measures = TRUE)
+
+```
+
+## Pain interference
+
+### Linear
+
+```{r}
+
+BPIinterference.linear.fit <- fitLinearModel('BPIinterference')
+
+summary(BPIinterference.linear.fit, fit.measures = TRUE)
+
+```
+
+### Piecewise
+
+```{r}
+
+BPIinterference.piecewise.fit <- fitPiecewiseModel('BPIinterference')
+
+summary(BPIinterference.piecewise.fit, fit.measures = TRUE)
+
+```
+
+
+### Model comparison
+
+```{r}
+anova(BPIinterference.linear.fit, BPIinterference.piecewise.fit)
+
+```
+
+
+
+
+
+### Moderated piecewise
+
+```{r}
+
+BPIinterference.piecewise.moderated.fit <- fitPiecewiseModeratedModel('BPIinterference')
+
+summary(BPIinterference.piecewise.moderated.fit, fit.measures = TRUE)
+
+```
+
+
+## CPAQ total
+
+### Linear
+
+```{r}
+
+CPAQ.linear.fit <- fitLinearModel('CPAQ')
+
+summary(CPAQ.linear.fit, fit.measures = TRUE)
+
+```
+
+### Piecewise
+
+```{r}
+
+CPAQ.piecewise.fit <- fitPiecewiseModel('CPAQ')
+
+summary(CPAQ.piecewise.fit, fit.measures = TRUE)
+
+```
+
+
+### Model comparison
+
+```{r}
+anova(CPAQ.linear.fit, CPAQ.piecewise.fit)
+
+```
+
+
