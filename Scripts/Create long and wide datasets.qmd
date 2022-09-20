@@ -10,9 +10,9 @@ editor: visual
 ```{r}
 library(here)
 library(tidyverse)
-library(ggdist)
 
-data.allvars <- read_csv(here('TeleACT-Aging_Joel_9-16-22.csv'))
+data.allvars <- read_csv(here('TeleACT-Aging_Joel_9-16-22.csv')) %>%
+  mutate(ageMeanCentered = age - mean(age))
 
 ```
 
