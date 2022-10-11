@@ -1,0 +1,118 @@
+---
+title: "Power analysis"
+author: "Joel Fishbein"
+format: html
+editor: visual
+---
+
+```{r}
+piecewise.model.generic.stdSlope1 <- '
+
+myIntercept =~ 1*Var.1 +
+              1*Var.2 +
+              1*Var.3 +
+              1*Var.4 +
+              1*Var.5
+              
+slope1 =~ 0*Var.1 +
+              1*Var.2 +
+              2*Var.3 +
+              2*Var.4 +
+              2*Var.5
+              
+slope2 =~ 0*Var.1 +
+              0*Var.2 +
+              0*Var.3 +
+              1*Var.4 +
+              2*Var.5
+
+slope1 ~~ 1*slope1
+              
+'
+
+```
+
+```{r}
+piecewise.model.generic.moderatedByAge.stdSlope1 <- '
+
+myIntercept =~ 1*Var.1 +
+              1*Var.2 +
+              1*Var.3 +
+              1*Var.4 +
+              1*Var.5
+              
+slope1 =~ 0*Var.1 +
+              1*Var.2 +
+              2*Var.3 +
+              2*Var.4 +
+              2*Var.5
+              
+slope2 =~ 0*Var.1 +
+              0*Var.2 +
+              0*Var.3 +
+              1*Var.4 +
+              2*Var.5
+
+slope1 ~~ 1*slope1
+
+myIntercept ~ ageMeanCentered
+slope1 ~ ageMeanCentered
+slope2 ~ ageMeanCentered
+              
+'
+```
+
+```{r}
+
+fitPiecewiseModel <- function(instrumentName){
+  # input instrumentName as argument
+  
+  model <- str_replace_all(
+                    piecewise.model.generic.stdSlope1, 
+                    c("Var" = instrumentName))
+  
+  fit <- lavaan::growth(model = model,
+                        data = data.wide,
+                        missing = 'FIML')
+  
+  return(fit)
+  
+}
+```
+
+```{r}
+
+fitPiecewiseModeratedModel <- function(instrumentName){
+  # input instrumentName as argument
+  
+  
+  model <- str_replace_all(
+    piecewise.model.generic.moderatedByAge.stdSlope1,
+                           c("Var" = instrumentName))
+  
+  fit <- lavaan::growth(model = model,
+                        data = data.wide,
+                        missing = 'FIML')
+  
+  return(fit)
+  
+}
+
+```
+
+```{r}
+
+
+BPIinterference.piecewise.fit <- fitPiecewiseModel('BPIinterference')
+
+summary(BPIinterference.piecewise.fit, fit.measures = TRUE)
+
+```
+
+```{r}
+
+BPIinterference.piecewise.moderated.fit <- fitPiecewiseModeratedModel('BPIinterference')
+
+summary(BPIinterference.piecewise.moderated.fit, fit.measures = TRUE)
+
+```
