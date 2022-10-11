@@ -7,10 +7,13 @@ editor: visual
 # Read in data
 
 ```{r}
+library(here)
 library(lavaan)
 library(tidyverse)
+library(broom)
 data.wide <- read_csv(here('Generated Datasets', 'data_wide.rds'))
 ```
+
 # Generic model functions
 
 ```{r}
@@ -53,7 +56,6 @@ slope2 =~ 0*Var.1 +
               2*Var.5
               
 '
-
 ```
 
 ```{r}
@@ -86,7 +88,6 @@ slope2 ~ ageMeanCentered
 
 ```
 
-
 ```{r}
 
 fitLinearModel <- function(instrumentName){
@@ -110,8 +111,9 @@ fitLinearModel <- function(instrumentName){
 fitPiecewiseModel <- function(instrumentName){
   # input instrumentName as argument
   
-  
-  model <- str_replace_all(piecewise.model.generic, c("Var" = instrumentName))
+  model <- str_replace_all(
+                    piecewise.model.generic, 
+                    c("Var" = instrumentName))
   
   fit <- lavaan::growth(model = model,
                         data = data.wide,
@@ -141,10 +143,8 @@ fitPiecewiseModeratedModel <- function(instrumentName){
 
 ```
 
-
-
-
 # Fit models to data
+
 ## Pain severity
 
 ### Linear
@@ -167,7 +167,6 @@ summary(BPIseverity.piecewise.fit, fit.measures = TRUE)
 
 ```
 
-
 ### Model comparison
 
 ```{r}
@@ -182,6 +181,9 @@ anova(BPIseverity.linear.fit, BPIseverity.piecewise.fit)
 BPIseverity.piecewise.moderated.fit <- fitPiecewiseModeratedModel('BPIseverity')
 
 summary(BPIseverity.piecewise.moderated.fit, fit.measures = TRUE)
+
+broom::tidy(BPIseverity.piecewise.moderated.fit) %>%
+  select(term, std.all)
 
 write_rds(x = BPIseverity.piecewise.moderated.fit, 
           file = here('Model fits', 'BPIseverity.piecewise.moderated.fit'))
@@ -210,17 +212,12 @@ summary(BPIinterference.piecewise.fit, fit.measures = TRUE)
 
 ```
 
-
 ### Model comparison
 
 ```{r}
 anova(BPIinterference.linear.fit, BPIinterference.piecewise.fit)
 
 ```
-
-
-
-
 
 ### Moderated piecewise
 
@@ -232,8 +229,9 @@ summary(BPIinterference.piecewise.moderated.fit, fit.measures = TRUE)
 
 ```
 
-
 ## CPAQ total
+
+Piecewise is best fit though negative resid var at T5, no age moderation effects
 
 ### Linear
 
@@ -255,7 +253,6 @@ summary(CPAQ.piecewise.fit, fit.measures = TRUE)
 
 ```
 
-
 ### Model comparison
 
 ```{r}
@@ -273,3 +270,84 @@ summary(CPAQ.piecewise.moderated.fit, fit.measures = TRUE)
 
 ```
 
+## CPAQ Activities
+
+Piecewise is best fit, no age moderation effects
+
+### Linear
+
+```{r}
+
+CPAQ.linear.fit <- fitLinearModel('CPAQ_Activities')
+
+summary(CPAQ.linear.fit, fit.measures = TRUE)
+
+```
+
+### Piecewise
+
+```{r}
+
+CPAQ.piecewise.fit <- fitPiecewiseModel('CPAQ_Activities')
+
+summary(CPAQ.piecewise.fit, fit.measures = TRUE)
+
+```
+
+### Model comparison
+
+```{r}
+anova(CPAQ.linear.fit, CPAQ.piecewise.fit)
+
+```
+
+### Moderated piecewise
+
+```{r}
+
+CPAQ.piecewise.moderated.fit <- fitPiecewiseModeratedModel('CPAQ_Activities')
+
+summary(CPAQ.piecewise.moderated.fit, fit.measures = TRUE)
+
+```
+
+## CPAQ Willingness
+
+Piecewise is best fit though negative resid var at T5, no age moderation effects
+
+### Linear
+
+```{r}
+
+CPAQ.linear.fit <- fitLinearModel('CPAQ_Willingness')
+
+summary(CPAQ.linear.fit, fit.measures = TRUE)
+
+```
+
+### Piecewise
+
+```{r}
+
+CPAQ.piecewise.fit <- fitPiecewiseModel('CPAQ_Willingness')
+
+summary(CPAQ.piecewise.fit, fit.measures = TRUE)
+
+```
+
+### Model comparison
+
+```{r}
+anova(CPAQ.linear.fit, CPAQ.piecewise.fit)
+
+```
+
+### Moderated piecewise
+
+```{r}
+
+CPAQ.piecewise.moderated.fit <- fitPiecewiseModeratedModel('CPAQ_Willingness')
+
+summary(CPAQ.piecewise.moderated.fit, fit.measures = TRUE)
+
+```
