@@ -79,10 +79,17 @@ slope2 =~ 0*Var.1 +
               0*Var.3 +
               1*Var.4 +
               2*Var.5
+
+slope1 ~~ slope1Sigma2*slope1
+slope2 ~~ slope2Sigma2*slope2
               
-myIntercept ~ ageMeanCentered
-slope1 ~ ageMeanCentered
-slope2 ~ ageMeanCentered
+myIntercept ~ mIntercept*ageMeanCentered
+slope1 ~ mSlope1*ageMeanCentered
+slope2 ~ mSlope2*ageMeanCentered
+
+ageES_slope1 := mSlope1/sqrt(slope1Sigma2)
+ageES_slope2 := mSlope2/sqrt(slope2Sigma2)
+
               
 '
 
@@ -181,9 +188,6 @@ anova(BPIseverity.linear.fit, BPIseverity.piecewise.fit)
 BPIseverity.piecewise.moderated.fit <- fitPiecewiseModeratedModel('BPIseverity')
 
 summary(BPIseverity.piecewise.moderated.fit, fit.measures = TRUE)
-
-broom::tidy(BPIseverity.piecewise.moderated.fit) %>%
-  select(term, std.all)
 
 write_rds(x = BPIseverity.piecewise.moderated.fit, 
           file = here('Model fits', 'BPIseverity.piecewise.moderated.fit'))
@@ -351,3 +355,106 @@ CPAQ.piecewise.moderated.fit <- fitPiecewiseModeratedModel('CPAQ_Willingness')
 summary(CPAQ.piecewise.moderated.fit, fit.measures = TRUE)
 
 ```
+
+
+## PHQ9
+
+Piecewise is best fit though negative resid var at T5, no age moderation effects
+
+### Linear
+
+```{r}
+
+PHQ9.linear.fit <- fitLinearModel('PHQ9')
+
+summary(PHQ9.linear.fit, fit.measures = TRUE)
+
+```
+
+### Piecewise
+
+```{r}
+
+PHQ9.piecewise.fit <- fitPiecewiseModel('PHQ9')
+
+summary(PHQ9.piecewise.fit, fit.measures = TRUE)
+
+```
+
+### Model comparison
+
+```{r}
+anova(PHQ9.linear.fit, PHQ9.piecewise.fit)
+
+```
+
+### Moderated piecewise
+
+```{r}
+
+PHQ9.piecewise.moderated.fit <- fitPiecewiseModeratedModel('PHQ9')
+
+summary(PHQ9.piecewise.moderated.fit, fit.measures = TRUE)
+
+```
+# PSQI
+
+### Linear
+
+```{r}
+
+PSQI.linear.fit <- fitLinearModel('PSQI')
+
+summary(PSQI.linear.fit, fit.measures = TRUE)
+
+```
+
+### Piecewise
+
+```{r}
+
+PSQI.piecewise.fit <- fitPiecewiseModel('PSQI')
+
+summary(PSQI.piecewise.fit, fit.measures = TRUE)
+
+```
+
+### Model comparison
+
+```{r}
+anova(PSQI.linear.fit, PSQI.piecewise.fit)
+
+```
+
+### Moderated linear
+
+```{r}
+
+PSQI.linear.moderated.model <-'
+
+myIntercept =~ 1*PSQI.1 +
+              1*PSQI.2 +
+              1*PSQI.3 +
+              1*PSQI.4 +
+              1*PSQI.5
+              
+slope1 =~ 0*PSQI.1 +
+              1*PSQI.2 +
+              2*PSQI.3 +
+              3*PSQI.4 +
+              4*PSQI.5
+              
+myIntercept ~ mIntercept*ageMeanCentered
+slope1 ~ mSlope1*ageMeanCentered
+
+              
+'
+
+PSQI.linear.moderated.fit <- lavaan::growth(model = PSQI.linear.moderated.model,
+                        data = data.wide,
+                        missing = 'FIML')
+
+summary(PSQI.linear.moderated.fit, fit.measures = TRUE)
+
+```
+

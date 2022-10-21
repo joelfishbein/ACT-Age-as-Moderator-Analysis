@@ -52,7 +52,7 @@ data.wide <- data.allvars %>%
     starts_with(
       c("ID", "Telehealth", "age", "Age_Bi",
         "BPIinterference", "BPIseverity",
-        "CPAQ.", "CPAQ_Activities", "CPAQ_Willingness")))
+        "CPAQ.", "CPAQ_Activities", "CPAQ_Willingness", "PHQ9", "PSQI")))
 
 colnames(data.wide)
 
