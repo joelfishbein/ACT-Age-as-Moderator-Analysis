@@ -1,0 +1,23 @@
+---
+title: "Latent change score models"
+format: html
+editor: visual
+---
+
+## \# Read in data
+
+```{r}
+library(here)
+
+library(lavaan)
+
+library(tidyverse)
+
+library(broom)
+
+data.wide <- read_csv(here('Generated Datasets', 'data_wide.rds'))
+```
+
+Eh, I don't think we should actually specify a bivariate LCS with age as moderator. Age affects the accumulative (latent) factor not the individual observations. So, we would need to then covary accumulative factors of the two variables. But now we're back to the start with PP-LGC?
+
+Eh might be worth a shot!
