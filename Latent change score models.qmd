@@ -18,6 +18,190 @@ library(broom)
 data.wide <- read_csv(here('Generated Datasets', 'data_wide.rds'))
 ```
 
-Eh, I don't think we should actually specify a bivariate LCS with age as moderator. Age affects the accumulative (latent) factor not the individual observations. So, we would need to then covary accumulative factors of the two variables. But now we're back to the start with PP-LGC?
+Syntax from: https://milanwiedemann.shinyapps.io/shinychange/
 
-Eh might be worth a shot!
+# 5 timepoints
+
+```{r}
+
+generic.syntax.not_moderated_by_age <- '
+
+# # # # # # # # # # # # # # # # # # # # #
+# Specify parameters for construct x ----
+# # # # # # # # # # # # # # # # # # # # #
+# Specify latent true scores 
+lVarA1 =~ 1 * VarA1 
+lVarA2 =~ 1 * VarA2 
+lVarA3 =~ 1 * VarA3 
+lVarA4 =~ 1 * VarA4 
+lVarA5 =~ 1 * VarA5 
+# Specify mean of latent true scores 
+lVarA1 ~ gamma_lVarA1 * 1 
+lVarA2 ~ 0 * 1 
+lVarA3 ~ 0 * 1 
+lVarA4 ~ 0 * 1 
+lVarA5 ~ 0 * 1 
+# Specify variance of latent true scores 
+lVarA1 ~~ sigma2_lVarA1 * lVarA1 
+lVarA2 ~~ 0 * lVarA2 
+lVarA3 ~~ 0 * lVarA3 
+lVarA4 ~~ 0 * lVarA4 
+lVarA5 ~~ 0 * lVarA5 
+# Specify intercept of obseved scores 
+VarA1 ~ 0 * 1 
+VarA2 ~ 0 * 1 
+VarA3 ~ 0 * 1 
+VarA4 ~ 0 * 1 
+VarA5 ~ 0 * 1 
+# Specify variance of observed scores 
+VarA1 ~~ sigma2_uVarA * VarA1 
+VarA2 ~~ sigma2_uVarA * VarA2 
+VarA3 ~~ sigma2_uVarA * VarA3 
+VarA4 ~~ sigma2_uVarA * VarA4 
+VarA5 ~~ sigma2_uVarA * VarA5 
+# Specify autoregressions of latent variables 
+lVarA2 ~ 1 * lVarA1 
+lVarA3 ~ 1 * lVarA2 
+lVarA4 ~ 1 * lVarA3 
+lVarA5 ~ 1 * lVarA4 
+# Specify latent change scores 
+dVarA2 =~ 1 * lVarA2 
+dVarA3 =~ 1 * lVarA3 
+dVarA4 =~ 1 * lVarA4 
+dVarA5 =~ 1 * lVarA5 
+# Specify latent change scores means 
+dVarA2 ~ 0 * 1 
+dVarA3 ~ 0 * 1 
+dVarA4 ~ 0 * 1 
+dVarA5 ~ 0 * 1 
+# Specify latent change scores variances 
+dVarA2 ~~ 0 * dVarA2 
+dVarA3 ~~ 0 * dVarA3 
+dVarA4 ~~ 0 * dVarA4 
+dVarA5 ~~ 0 * dVarA5 
+# Specify constant change factor 
+g2 =~ 1 * dVarA2 + 1 * dVarA3 + 1 * dVarA4 + 1 * dVarA5 
+# Specify constant change factor mean 
+g2 ~ alpha_g2 * 1 
+# Specify constant change factor variance 
+g2 ~~ sigma2_g2 * g2 
+# Specify constant change factor covariance with the initial true score 
+g2 ~~ sigma_g2lVarA1 * lVarA1
+# Specify proportional change component 
+dVarA2 ~ beta_VarA * lVarA1 
+dVarA3 ~ beta_VarA * lVarA2 
+dVarA4 ~ beta_VarA * lVarA3 
+dVarA5 ~ beta_VarA * lVarA4 
+# # # # # # # # # # # # # # # # # # # # #
+# Specify parameters for construct y ----
+# # # # # # # # # # # # # # # # # # # # #
+# Specify latent true scores 
+lVarB1 =~ 1 * VarB1 
+lVarB2 =~ 1 * VarB2 
+lVarB3 =~ 1 * VarB3 
+lVarB4 =~ 1 * VarB4 
+lVarB5 =~ 1 * VarB5 
+# Specify mean of latent true scores 
+lVarB1 ~ gamma_lVarB1 * 1 
+lVarB2 ~ 0 * 1 
+lVarB3 ~ 0 * 1 
+lVarB4 ~ 0 * 1 
+lVarB5 ~ 0 * 1 
+# Specify variance of latent true scores 
+lVarB1 ~~ sigma2_lVarB1 * lVarB1 
+lVarB2 ~~ 0 * lVarB2 
+lVarB3 ~~ 0 * lVarB3 
+lVarB4 ~~ 0 * lVarB4 
+lVarB5 ~~ 0 * lVarB5 
+# Specify intercept of obseved scores 
+VarB1 ~ 0 * 1 
+VarB2 ~ 0 * 1 
+VarB3 ~ 0 * 1 
+VarB4 ~ 0 * 1 
+VarB5 ~ 0 * 1 
+# Specify variance of observed scores 
+VarB1 ~~ sigma2_uVarB * VarB1 
+VarB2 ~~ sigma2_uVarB * VarB2 
+VarB3 ~~ sigma2_uVarB * VarB3 
+VarB4 ~~ sigma2_uVarB * VarB4 
+VarB5 ~~ sigma2_uVarB * VarB5 
+# Specify autoregressions of latent variables 
+lVarB2 ~ 1 * lVarB1 
+lVarB3 ~ 1 * lVarB2 
+lVarB4 ~ 1 * lVarB3 
+lVarB5 ~ 1 * lVarB4 
+# Specify latent change scores 
+dVarB2 =~ 1 * lVarB2 
+dVarB3 =~ 1 * lVarB3 
+dVarB4 =~ 1 * lVarB4 
+dVarB5 =~ 1 * lVarB5 
+# Specify latent change scores means 
+dVarB2 ~ 0 * 1 
+dVarB3 ~ 0 * 1 
+dVarB4 ~ 0 * 1 
+dVarB5 ~ 0 * 1 
+# Specify latent change scores variances 
+dVarB2 ~~ 0 * dVarB2 
+dVarB3 ~~ 0 * dVarB3 
+dVarB4 ~~ 0 * dVarB4 
+dVarB5 ~~ 0 * dVarB5 
+# Specify constant change factor 
+j2 =~ 1 * dVarB2 + 1 * dVarB3 + 1 * dVarB4 + 1 * dVarB5 
+# Specify constant change factor mean 
+j2 ~ alpha_j2 * 1 
+# Specify constant change factor variance 
+j2 ~~ sigma2_j2 * j2 
+# Specify constant change factor covariance with the initial true score 
+j2 ~~ sigma_j2lVarB1 * lVarB1
+# Specify proportional change component 
+dVarB2 ~ beta_VarB * lVarB1 
+dVarB3 ~ beta_VarB * lVarB2 
+dVarB4 ~ beta_VarB * lVarB3 
+dVarB5 ~ beta_VarB * lVarB4 
+# Specify residual covariances 
+VarA1 ~~ sigma_su * VarB1 
+VarA2 ~~ sigma_su * VarB2 
+VarA3 ~~ sigma_su * VarB3 
+VarA4 ~~ sigma_su * VarB4 
+VarA5 ~~ sigma_su * VarB5 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Specify covariances betweeen specified change components (alpha) and intercepts (initial latent true scores lx1 and ly1) ----
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Specify covariance of intercepts 
+lVarA1 ~~ sigma_lVarB1lVarA1 * lVarB1 
+# Specify covariance of constant change and intercept between constructs 
+lVarB1 ~~ sigma_g2lVarB1 * g2 
+# Specify covariance of constant change and intercept between constructs 
+lVarA1 ~~ sigma_j2lVarA1 * j2 
+# Specify covariance of constant change factors between constructs 
+g2 ~~ sigma_j2g2 * j2 
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Specify between-construct coupling parameters ----
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Change score VarA (t) is determined by change score VarB (t-1)  
+dVarA3 ~ xi_lag_VarAVarB * dVarB2 
+dVarA4 ~ xi_lag_VarAVarB * dVarB3 
+dVarA5 ~ xi_lag_VarAVarB * dVarB4 
+# Change score VarB (t) is determined by change score VarA (t-1)  
+dVarB3 ~ xi_lag_VarBVarA * dVarA2 
+dVarB4 ~ xi_lag_VarBVarA * dVarA3 
+dVarB5 ~ xi_lag_VarBVarA * dVarA4 
+
+'
+
+
+```
+
+```{r}
+
+model.PHQ9.BPIseverity <-
+  stringr::str_replace_all(
+    string = generic.syntax.not_moderated_by_age, pattern =  c("VarA" = "PHQ9.", "VarB" = "BPIseverity."))
+
+model.PHQ9.BPIseverity
+
+unmoderated_fit <- lavaan::lavaan(model = model.PHQ9.BPIseverity, data = data.wide, missing = "FIML")
+
+summary(fit, fit.measures = TRUE)
+
+```
