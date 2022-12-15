@@ -1,0 +1,153 @@
+---
+title: "Moderated Model Estimates"
+format: html
+editor: visual
+---
+
+# Read in data and libraries
+
+```{r}
+
+library(tidyverse)
+library(broom)
+library(lavaan)
+library(kableExtra)
+library(finalfit)
+```
+
+```{r}
+
+
+BPIinterference.piecewise.moderated.fit<- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'BPIinterference.piecewise.moderated.fit'))
+
+BPIseverity.piecewise.moderated.fit <- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'BPIseverity.piecewise.moderated.fit'))
+
+CPAQ.piecewise.moderated.fit <- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'CPAQ.piecewise.moderated.fit'))
+
+PHQ9.piecewise.moderated.fit <- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'PHQ9.piecewise.moderated.fit'))
+
+PSQI.linear.moderated.fit <- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'PSQI.linear.moderated.fit'))
+
+```
+
+
+# Extract parameters
+
+
+## generic function
+
+```{r}
+
+extractParameters <- function(fit, outcomeName){
+  
+  broom::tidy(fit) %>%
+    mutate(outcome = outcomeName)
+  
+}
+
+```
+
+
+
+```{r}
+
+parameters <- 
+  
+  # extract all estimates
+  bind_rows(
+    extractParameters(
+      BPIinterference.piecewise.moderated.fit, 
+      'BPI Interference'),
+    extractParameters(
+      BPIseverity.piecewise.moderated.fit, 
+      'BPI Severity'),
+    extractParameters(
+      CPAQ.piecewise.moderated.fit, 
+      'CPAQ'),
+    extractParameters(
+      PHQ9.piecewise.moderated.fit, 
+      'PHQ9'),
+  extractParameters(
+      PSQI.linear.moderated.fit, 
+      'PSQI')) %>%
+
+    filter(term %in% c("myIntercept ~1 ", 
+                       "slope1 ~1 ",
+                       "slope2 ~1 ",
+                       "linearSlope ~1 ",
+                       "myIntercept ~ ageMeanCentered",
+                       "slope1 ~ ageMeanCentered",
+                       "slope2 ~ ageMeanCentered",
+                       "linearSlope ~ ageMeanCentered")) %>%
+  
+  # change term to more readable text
+  mutate(parameter = 
+           str_replace_all(term, 
+                           c("myIntercept ~1 " = "Intercept",
+                             "slope1 ~1 " = "Intervention Slope",
+                             "slope2 ~1 " = "FU Slope",
+                             "linearSlope ~1 " = "Linear Slope",
+                             "myIntercept ~ ageMeanCentered" = "Age x Intercept",
+                             "slope1 ~ ageMeanCentered" = "Age x Intervention Slope",
+                             "slope2 ~ ageMeanCentered" = "Age x FU Slope",
+                             "linearSlope ~ ageMeanCentered" = "Age x Linear Slope"))) %>%
+         
+  
+  # just keep columns of interest
+  select(outcome, parameter, estimate, std.error, p.value)
+
+```
+
+
+```{r}
+
+parameters
+
+```
+
+# Format table in kableExtra
+
+```{r}
+table <- parameters %>%
+  
+  # do rounding
+  mutate(across(.cols = estimate:std.error, .fns = round_tidy, digits = 2)) %>%
+  mutate(p.value =  round_tidy(p.value, digits = 3)) %>%
+
+  # drop outcome
+  select(-outcome) %>%
+  
+ # do kable
+  kable(col.names = c('Parameter','Estimate', 'SE','p')) %>%
+  kableExtra::group_rows(
+    group_label = 'Pain Interference (BPI)', start_row = 1, end_row = 6,italic = TRUE, bold = FALSE) %>%
+  kableExtra::group_rows(
+    group_label = 'Pain Severity (BPI)', start_row = 7, end_row = 12,italic = TRUE, bold = FALSE) %>%
+  kableExtra::group_rows(
+    group_label = 'Pain Acceptance (CPAQ)', start_row = 13, end_row = 18,italic = TRUE, bold = FALSE) %>%
+  kableExtra::group_rows(
+    group_label = 'Depression Symptoms (PHQ-9)', start_row = 19, end_row = 24,italic = TRUE, bold = FALSE) %>%
+  kableExtra::group_rows(
+    group_label = 'Sleep Quality (PSQI)', start_row = 25, end_row = 28,italic = TRUE, bold = FALSE) %>%
+  
+  kableExtra::kable_classic_2(html_font = 'Times New Roman')
+  
+
+
+table 
+```
