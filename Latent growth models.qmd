@@ -356,7 +356,6 @@ summary(CPAQ.piecewise.moderated.fit, fit.measures = TRUE)
 
 ```
 
-
 ## PHQ9
 
 Piecewise is best fit though negative resid var at T5, no age moderation effects
@@ -397,6 +396,7 @@ PHQ9.piecewise.moderated.fit <- fitPiecewiseModeratedModel('PHQ9')
 summary(PHQ9.piecewise.moderated.fit, fit.measures = TRUE)
 
 ```
+
 # PSQI
 
 ### Linear
@@ -438,14 +438,14 @@ myIntercept =~ 1*PSQI.1 +
               1*PSQI.4 +
               1*PSQI.5
               
-slope1 =~ 0*PSQI.1 +
+linearSlope =~ 0*PSQI.1 +
               1*PSQI.2 +
               2*PSQI.3 +
               3*PSQI.4 +
               4*PSQI.5
               
 myIntercept ~ mIntercept*ageMeanCentered
-slope1 ~ mSlope1*ageMeanCentered
+linearSlope ~ mSlope1*ageMeanCentered
 
               
 '
@@ -458,3 +458,68 @@ summary(PSQI.linear.moderated.fit, fit.measures = TRUE)
 
 ```
 
+# Save models
+
+## Unmoderated
+
+```{r}
+
+write_rds(x = BPIinterference.piecewise.fit,file = 
+            here('Model fits',
+                 'Unmoderated',
+                 'BPIinterference.piecewise.fit'))
+
+write_rds(x = BPIseverity.piecewise.fit,file = 
+            here('Model fits',
+                 'Unmoderated',
+                 'BPIseverity.piecewise.fit'))
+
+write_rds(x = CPAQ.piecewise.fit,file = 
+            here('Model fits',
+                 'Unmoderated',
+                 'CPAQ.piecewise.fit'))
+
+write_rds(x = PHQ9.piecewise.fit,file = 
+            here('Model fits',
+                 'Unmoderated',
+                 'PHQ9.piecewise.fit'))
+
+write_rds(x = PSQI.linear.fit,file = 
+            here('Model fits',
+                 'Unmoderated',
+                 'PSQI.linear.fit'))
+
+
+```
+
+## Moderated
+
+```{r}
+
+write_rds(x = BPIinterference.piecewise.moderated.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'BPIinterference.piecewise.moderated.fit'))
+
+write_rds(x = BPIseverity.piecewise.moderated.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'BPIseverity.piecewise.moderated.fit'))
+
+write_rds(x = CPAQ.piecewise.moderated.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'CPAQ.piecewise.moderated.fit'))
+
+write_rds(x = PHQ9.piecewise.moderated.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'PHQ9.piecewise.moderated.fit'))
+
+write_rds(x = PSQI.linear.moderated.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'PSQI.linear.moderated.fit'))
+
+
+```
