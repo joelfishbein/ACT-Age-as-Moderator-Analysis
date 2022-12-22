@@ -1,0 +1,175 @@
+---
+title: "Pick a Point Model Estimates"
+format: html
+editor: visual
+---
+
+# Read libraries and data
+
+```{r}
+
+library(tidyverse)
+library(broom)
+library(lavaan)
+library(kableExtra)
+library(finalfit)
+
+```
+
+
+```{r}
+
+BPIseverity.centered35.fit <- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'Pick-A-Point',
+                 'BPIseverity.centered35.fit'))
+
+BPIseverity.centered45.fit <- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'Pick-A-Point',
+                 'BPIseverity.centered45.fit'))
+
+BPIseverity.centered55.fit <- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'Pick-A-Point',
+                 'BPIseverity.centered55.fit'))
+
+BPIseverity.centered65.fit <- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'Pick-A-Point',
+                 'BPIseverity.centered65.fit'))
+
+
+BPIinterference.centered35.fit <- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'Pick-A-Point',
+                 'BPIinterference.centered35.fit'))
+
+BPIinterference.centered45.fit <- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'Pick-A-Point',
+                 'BPIinterference.centered45.fit'))
+
+BPIinterference.centered55.fit <- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'Pick-A-Point',
+                 'BPIinterference.centered55.fit'))
+
+BPIinterference.centered65.fit <- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'Pick-A-Point',
+                 'BPIinterference.centered65.fit'))
+```
+
+# Generic function
+
+```{r}
+
+extractParameters <- function(fit, outcomeName, age){
+  
+  broom::tidy(fit) %>%
+    mutate(outcome = outcomeName,
+           age = age)
+  
+}
+
+
+
+```
+
+# Extract estimates
+
+```{r}
+
+
+parameters <- 
+  
+  # extract all estimates
+  bind_rows(
+    extractParameters(fit = BPIseverity.centered35.fit,
+                'Pain Severity (BPI)',
+                age = 35),
+    extractParameters(fit = BPIseverity.centered45.fit,
+                'Pain Severity (BPI)',
+                age = 45),
+    extractParameters(fit = BPIseverity.centered55.fit,
+                'Pain Severity (BPI)',
+                age = 55),
+    extractParameters(fit = BPIseverity.centered65.fit,
+                'Pain Severity (BPI)',
+                age = 65),
+
+     extractParameters(fit = BPIinterference.centered35.fit,
+                'Pain interference (BPI)',
+                age = 35),
+    extractParameters(fit = BPIinterference.centered45.fit,
+                'Pain interference (BPI)',
+                age = 45),
+    extractParameters(fit = BPIinterference.centered55.fit,
+                'Pain interference (BPI)',
+                age = 55),
+    extractParameters(fit = BPIinterference.centered65.fit,
+                'Pain interference (BPI)',
+                age = 65)) %>% 
+    
+
+    filter(term %in% c("myIntercept ~1 ", 
+                       "slope1 ~1 ",
+                       "slope2 ~1 ")) %>%
+  
+  # change term to more readable text
+  mutate(parameter = 
+           str_replace_all(term, 
+                           c("myIntercept ~1 " = "Intercept",
+                             "slope1 ~1 " = "Intervention Slope",
+                             "slope2 ~1 " = "FU Slope"))) %>%
+         
+  
+  # just keep columns of interest
+  select(outcome, age, parameter, estimate, std.error, p.value) %>%
+  
+    # do rounding
+  mutate(across(.cols = estimate:std.error, .fns = round_tidy, digits = 2)) %>%
+  mutate(p.value =  round_tidy(p.value, digits = 3)) %>%
+  
+  pivot_longer(estimate:p.value) %>%
+  
+  pivot_wider(names_from = c("parameter","name"))
+
+parameters
+
+```
+
+```{r}
+
+table <- parameters %>%
+  
+
+
+  # drop outcome
+  select(-outcome) %>%
+  
+ # do kable
+  kable(col.names = c('Age',rep(c('Estimate', 'SE','p'),3))) %>%
+  kableExtra::add_header_above(c(" " = 1, 
+                               "Intercept" = 3,
+                               "Intervention Slope" = 3,
+                               "FU Slope" = 3)) %>%
+  kableExtra::group_rows(
+    group_label = 'Pain Severity (BPI)', start_row = 1, end_row = 4,italic = TRUE, bold = FALSE) %>%
+  kableExtra::group_rows(
+    group_label = 'Pain Interference (BPI)', start_row = 5, end_row = 8, italic = TRUE, bold = FALSE) %>%
+  
+  kableExtra::kable_classic_2(html_font = 'Times New Roman')
+
+
+table
+```
