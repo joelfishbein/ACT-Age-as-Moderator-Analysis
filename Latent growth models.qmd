@@ -16,6 +16,8 @@ data.wide <- read_csv(here('Generated Datasets', 'data_wide.rds'))
 
 # Generic model functions
 
+## Linear
+
 ```{r}
 
 linear.model.generic <- '
@@ -31,8 +33,11 @@ linearSlope =~ 0*Var.1 +
               2*Var.3 +
               3*Var.4 +
               4*Var.5
+              
 '
 ```
+
+## Piecewise
 
 ```{r}
 piecewise.model.generic <- '
@@ -58,7 +63,12 @@ slope2 =~ 0*Var.1 +
 '
 ```
 
+## Moderated Piecewise
+
 ```{r}
+
+# function fills "ageGeneric" with a named variable from the dataset
+# fills to ageMeanCentered by default
 
 piecewise.model.moderated.generic <- '
 
@@ -83,9 +93,9 @@ slope2 =~ 0*Var.1 +
 slope1 ~~ slope1Sigma2*slope1
 slope2 ~~ slope2Sigma2*slope2
               
-myIntercept ~ mIntercept*ageMeanCentered
-slope1 ~ mSlope1*ageMeanCentered
-slope2 ~ mSlope2*ageMeanCentered
+myIntercept ~ mIntercept*ageGeneric
+slope1 ~ mSlope1*ageGeneric
+slope2 ~ mSlope2*ageGeneric
 
 ageES_slope1 := mSlope1/sqrt(slope1Sigma2)
 ageES_slope2 := mSlope2/sqrt(slope2Sigma2)
@@ -101,7 +111,8 @@ fitLinearModel <- function(instrumentName){
   # input instrumentName as argument
   
   
-  model <- str_replace_all(linear.model.generic, c("Var" = instrumentName))
+  model <- str_replace_all(linear.model.generic, 
+                           c("Var" = instrumentName))
   
   fit <- lavaan::growth(model = model,
                         data = data.wide,
@@ -134,11 +145,13 @@ fitPiecewiseModel <- function(instrumentName){
 
 ```{r}
 
-fitPiecewiseModeratedModel <- function(instrumentName){
+fitPiecewiseModeratedModel <- function(instrumentName, 
+                                       ageVar = "ageMeanCentered" ){
   # input instrumentName as argument
   
   
-  model <- str_replace_all(piecewise.model.moderated.generic, c("Var" = instrumentName))
+  model <- str_replace_all(piecewise.model.moderated.generic, c("Var" = instrumentName,
+                                                                "ageGeneric" = ageVar))
   
   fit <- lavaan::growth(model = model,
                         data = data.wide,
@@ -194,6 +207,24 @@ write_rds(x = BPIseverity.piecewise.moderated.fit,
 
 ```
 
+### Other moderated models (Pick-A-Point)
+
+```{r}
+
+BPIseverity.centered35.fit <-
+  fitPiecewiseModeratedModel('BPIseverity', ageVar = 'ageCenteredAt35')
+
+BPIseverity.centered45.fit <-
+  fitPiecewiseModeratedModel('BPIseverity', ageVar = 'ageCenteredAt45')
+
+BPIseverity.centered55.fit <-
+  fitPiecewiseModeratedModel('BPIseverity', ageVar = 'ageCenteredAt55')
+
+BPIseverity.centered65.fit <-
+  fitPiecewiseModeratedModel('BPIseverity', ageVar = 'ageCenteredAt65')
+
+```
+
 ## Pain interference
 
 ### Linear
@@ -233,6 +264,24 @@ summary(BPIinterference.piecewise.moderated.fit, fit.measures = TRUE)
 
 ```
 
+### Other moderated models (Pick-A-Point)
+
+```{r}
+
+BPIinterference.centered35.fit <-
+  fitPiecewiseModeratedModel('BPIinterference', ageVar = 'ageCenteredAt35')
+
+BPIinterference.centered45.fit <-
+  fitPiecewiseModeratedModel('BPIinterference', ageVar = 'ageCenteredAt45')
+
+BPIinterference.centered55.fit <-
+  fitPiecewiseModeratedModel('BPIinterference', ageVar = 'ageCenteredAt55')
+
+BPIinterference.centered65.fit <-
+  fitPiecewiseModeratedModel('BPIinterference', ageVar = 'ageCenteredAt65')
+
+```
+
 ## CPAQ total
 
 Piecewise is best fit though negative resid var at T5, no age moderation effects
@@ -249,6 +298,8 @@ summary(CPAQ.linear.fit, fit.measures = TRUE)
 
 ### Piecewise
 
+Timepoint 5 observed variable variance \< 0, p = ns Thus re-run with that variance set to zero below
+
 ```{r}
 
 CPAQ.piecewise.fit <- fitPiecewiseModel('CPAQ')
@@ -257,10 +308,58 @@ summary(CPAQ.piecewise.fit, fit.measures = TRUE)
 
 ```
 
+### Piecewise, timepoint 5 variance set to zero
+
+See above
+
+```{r}
+
+CPAQ.piecewise.T5varIsZero.model <- '
+
+myIntercept =~ 1*CPAQ.1 +
+              1*CPAQ.2 +
+              1*CPAQ.3 +
+              1*CPAQ.4 +
+              1*CPAQ.5
+              
+slope1 =~ 0*CPAQ.1 +
+              1*CPAQ.2 +
+              2*CPAQ.3 +
+              2*CPAQ.4 +
+              2*CPAQ.5
+              
+slope2 =~ 0*CPAQ.1 +
+              0*CPAQ.2 +
+              0*CPAQ.3 +
+              1*CPAQ.4 +
+              2*CPAQ.5
+              
+              
+CPAQ.5 ~~ 0*CPAQ.5
+
+slope1 ~~ slope1Sigma2*slope1
+slope2 ~~ slope2Sigma2*slope2
+              
+# myIntercept ~ mIntercept*ageMeanCentered
+# slope1 ~ mSlope1*ageMeanCentered
+# slope2 ~ mSlope2*ageMeanCentered
+'
+
+CPAQ.piecewise.T5varIsZero.fit <- lavaan::growth(model = CPAQ.piecewise.T5varIsZero.model, 
+                                                 data = data.wide,
+                        missing = 'FIML')
+
+
+summary(CPAQ.piecewise.T5varIsZero.fit, fit.measures = TRUE)
+
+```
+
 ### Model comparison
 
 ```{r}
 anova(CPAQ.linear.fit, CPAQ.piecewise.fit)
+
+anova(CPAQ.linear.fit, CPAQ.piecewise.T5varIsZero.fit)
 
 ```
 
@@ -268,7 +367,39 @@ anova(CPAQ.linear.fit, CPAQ.piecewise.fit)
 
 ```{r}
 
-CPAQ.piecewise.moderated.fit <- fitPiecewiseModeratedModel('CPAQ')
+CPAQ.piecewise.moderated.model <-'
+
+myIntercept =~ 1*CPAQ.1 +
+              1*CPAQ.2 +
+              1*CPAQ.3 +
+              1*CPAQ.4 +
+              1*CPAQ.5
+              
+slope1 =~ 0*CPAQ.1 +
+              1*CPAQ.2 +
+              2*CPAQ.3 +
+              2*CPAQ.4 +
+              2*CPAQ.5
+              
+slope2 =~ 0*CPAQ.1 +
+              0*CPAQ.2 +
+              0*CPAQ.3 +
+              1*CPAQ.4 +
+              2*CPAQ.5
+              
+              
+CPAQ.5 ~~ 0*CPAQ.5
+
+slope1 ~~ slope1Sigma2*slope1
+slope2 ~~ slope2Sigma2*slope2
+              
+myIntercept ~ mIntercept*ageMeanCentered
+slope1 ~ mSlope1*ageMeanCentered
+slope2 ~ mSlope2*ageMeanCentered'
+
+CPAQ.piecewise.moderated.fit <- lavaan::growth(model = CPAQ.piecewise.moderated.model, 
+                                                 data = data.wide,
+                        missing = 'FIML')
 
 summary(CPAQ.piecewise.moderated.fit, fit.measures = TRUE)
 
@@ -356,7 +487,6 @@ summary(CPAQ.piecewise.moderated.fit, fit.measures = TRUE)
 
 ```
 
-
 ## PHQ9
 
 Piecewise is best fit though negative resid var at T5, no age moderation effects
@@ -397,6 +527,7 @@ PHQ9.piecewise.moderated.fit <- fitPiecewiseModeratedModel('PHQ9')
 summary(PHQ9.piecewise.moderated.fit, fit.measures = TRUE)
 
 ```
+
 # PSQI
 
 ### Linear
@@ -438,14 +569,14 @@ myIntercept =~ 1*PSQI.1 +
               1*PSQI.4 +
               1*PSQI.5
               
-slope1 =~ 0*PSQI.1 +
+linearSlope =~ 0*PSQI.1 +
               1*PSQI.2 +
               2*PSQI.3 +
               3*PSQI.4 +
               4*PSQI.5
               
 myIntercept ~ mIntercept*ageMeanCentered
-slope1 ~ mSlope1*ageMeanCentered
+linearSlope ~ mSlope1*ageMeanCentered
 
               
 '
@@ -458,3 +589,123 @@ summary(PSQI.linear.moderated.fit, fit.measures = TRUE)
 
 ```
 
+# Save models
+
+## Unmoderated
+
+```{r}
+
+write_rds(x = BPIinterference.piecewise.fit,file = 
+            here('Model fits',
+                 'Unmoderated',
+                 'BPIinterference.piecewise.fit'))
+
+write_rds(x = BPIseverity.piecewise.fit,file = 
+            here('Model fits',
+                 'Unmoderated',
+                 'BPIseverity.piecewise.fit'))
+
+write_rds(x = CPAQ.piecewise.T5varIsZero.fit,file = 
+            here('Model fits',
+                 'Unmoderated',
+                 'CPAQ.piecewise.fit'))
+
+write_rds(x = PHQ9.piecewise.fit,file = 
+            here('Model fits',
+                 'Unmoderated',
+                 'PHQ9.piecewise.fit'))
+
+write_rds(x = PSQI.linear.fit,file = 
+            here('Model fits',
+                 'Unmoderated',
+                 'PSQI.linear.fit'))
+
+
+```
+
+## Moderated
+
+```{r}
+
+write_rds(x = BPIinterference.piecewise.moderated.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'BPIinterference.piecewise.moderated.fit'))
+
+write_rds(x = BPIseverity.piecewise.moderated.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'BPIseverity.piecewise.moderated.fit'))
+
+write_rds(x = CPAQ.piecewise.moderated.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'CPAQ.piecewise.moderated.fit'))
+
+write_rds(x = PHQ9.piecewise.moderated.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'PHQ9.piecewise.moderated.fit'))
+
+write_rds(x = PSQI.linear.moderated.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'PSQI.linear.moderated.fit'))
+
+
+```
+
+## Pick a point
+
+```{r}
+
+write_rds(x = BPIseverity.centered35.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'Pick-A-Point',
+                 'BPIseverity.centered35.fit'))
+
+write_rds(x = BPIseverity.centered45.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'Pick-A-Point',
+                 'BPIseverity.centered45.fit'))
+
+write_rds(x = BPIseverity.centered55.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'Pick-A-Point',
+                 'BPIseverity.centered55.fit'))
+
+write_rds(x = BPIseverity.centered65.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'Pick-A-Point',
+                 'BPIseverity.centered65.fit'))
+
+
+write_rds(x = BPIinterference.centered35.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'Pick-A-Point',
+                 'BPIinterference.centered35.fit'))
+
+write_rds(x = BPIinterference.centered45.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'Pick-A-Point',
+                 'BPIinterference.centered45.fit'))
+
+write_rds(x = BPIinterference.centered55.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'Pick-A-Point',
+                 'BPIinterference.centered55.fit'))
+
+write_rds(x = BPIinterference.centered65.fit,file = 
+            here('Model fits',
+                 'Moderated',
+                 'Pick-A-Point',
+                 'BPIinterference.centered65.fit'))
+
+```

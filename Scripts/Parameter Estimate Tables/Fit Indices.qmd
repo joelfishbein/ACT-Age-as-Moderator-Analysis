@@ -1,0 +1,189 @@
+---
+title: "Fit Indices"
+format: html
+editor: visual
+---
+
+Note: p values associated with the Chi Sq test cannot be read in from broom::augment, thus I filled those by hand in MS Word.
+
+# Read in data and libraries
+
+```{r}
+
+library(tidyverse)
+library(broom)
+library(lavaan)
+library(kableExtra)
+library(finalfit)
+library(here)
+
+```
+
+```{r}
+
+
+BPIinterference.piecewise.moderated.fit<- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'BPIinterference.piecewise.moderated.fit'))
+
+BPIseverity.piecewise.moderated.fit <- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'BPIseverity.piecewise.moderated.fit'))
+
+CPAQ.piecewise.moderated.fit <- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'CPAQ.piecewise.moderated.fit'))
+
+PHQ9.piecewise.moderated.fit <- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'PHQ9.piecewise.moderated.fit'))
+
+PSQI.linear.moderated.fit <- read_rds(file = 
+            here('Model fits',
+                 'Moderated',
+                 'PSQI.linear.moderated.fit'))
+
+BPIinterference.piecewise.fit <- read_rds(file = 
+
+            here('Model fits',
+
+                 'Unmoderated',
+
+                 'BPIinterference.piecewise.fit'))
+
+BPIseverity.piecewise.fit <- read_rds(file = 
+
+            here('Model fits',
+
+                 'Unmoderated',
+
+                 'BPIseverity.piecewise.fit'))
+
+CPAQ.piecewise.fit <- read_rds(file = 
+
+            here('Model fits',
+
+                 'Unmoderated',
+
+                 'CPAQ.piecewise.fit'))
+
+PHQ9.piecewise.fit <- read_rds(file = 
+
+            here('Model fits',
+
+                 'Unmoderated',
+
+                 'PHQ9.piecewise.fit'))
+
+PSQI.linear.fit <- read_rds(file =
+
+            here('Model fits',
+
+                 'Unmoderated',
+
+                 'PSQI.linear.fit'))
+
+
+```
+
+# Extract parameters
+
+## generic function
+
+```{r}
+
+extractFitIndices <- function(fit, outcomeName, moderated = FALSE){
+  broom::glance(fit) %>%
+    mutate(outcome = outcomeName,
+           moderated = moderated)
+
+}
+
+```
+
+```{r}
+
+glance(PHQ9.piecewise.fit)
+
+fitIndices <- 
+
+  bind_rows(
+    extractFitIndices(
+      BPIinterference.piecewise.fit, 
+      'BPI Interference'),
+    extractFitIndices(
+      BPIseverity.piecewise.fit, 
+      'BPI Severity'),
+    extractFitIndices(
+      CPAQ.piecewise.fit, 
+      'CPAQ'),
+    extractFitIndices(
+      PHQ9.piecewise.fit, 
+      'PHQ9'),
+  extractFitIndices(
+      PSQI.linear.fit, 
+      'PSQI'),
+
+extractFitIndices(
+      BPIinterference.piecewise.moderated.fit, 
+      'BPI Interference', moderated = TRUE),
+    extractFitIndices(
+      BPIseverity.piecewise.moderated.fit, 
+      'BPI Severity', moderated = TRUE),
+    extractFitIndices(
+      CPAQ.piecewise.moderated.fit, 
+      'CPAQ', moderated = TRUE),
+    extractFitIndices(
+      PHQ9.piecewise.moderated.fit, 
+      'PHQ9', moderated = TRUE),
+  extractFitIndices(
+      PSQI.linear.moderated.fit, 
+      'PSQI', moderated = TRUE)) %>%
+  
+  mutate(df = c(6, 6, 7, 6, 10,
+                8, 8, 9, 8, 12)) %>%
+  select('moderated', 'outcome',chisq,df,'cfi','srmr','rmsea') %>%
+
+  mutate(across(chisq, round_tidy, 3)) %>%
+  mutate(across(cfi:rmsea, round_tidy, 3))
+
+fitIndices
+  
+```
+
+# Format table in kableExtra
+
+```{r}
+
+table <- fitIndices %>%
+
+  
+  select(-moderated) %>%
+
+  
+
+ # do kable
+
+  kable() %>%
+
+  kableExtra::group_rows(
+
+    group_label = 'Unmoderated', start_row = 1, end_row = 5,italic = TRUE, bold = FALSE) %>%
+
+  kableExtra::group_rows(
+
+    group_label = 'Moderated', start_row = 6, end_row = 10,italic = TRUE, bold = FALSE) %>%
+
+  kableExtra::kable_classic_2(html_font = 'Times New Roman')
+
+  
+
+table 
+
+```
+
+

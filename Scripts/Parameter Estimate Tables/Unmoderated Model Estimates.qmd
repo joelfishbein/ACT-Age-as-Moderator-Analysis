@@ -1,0 +1,134 @@
+---
+title: "Unmoderated Model Estimates"
+format: html
+editor: visual
+---
+
+# Read in data and libraries
+
+```{r}
+
+library(tidyverse)
+library(broom)
+library(lavaan)
+library(kableExtra)
+library(finalfit)
+```
+
+```{r}
+
+
+BPIinterference.piecewise.fit <- read_rds(file = 
+            here('Model fits',
+                 'Unmoderated',
+                 'BPIinterference.piecewise.fit'))
+
+BPIseverity.piecewise.fit <- read_rds(file = 
+            here('Model fits',
+                 'Unmoderated',
+                 'BPIseverity.piecewise.fit'))
+
+CPAQ.piecewise.fit <- read_rds(file = 
+            here('Model fits',
+                 'Unmoderated',
+                 'CPAQ.piecewise.fit'))
+
+PHQ9.piecewise.fit <- read_rds(file = 
+            here('Model fits',
+                 'Unmoderated',
+                 'PHQ9.piecewise.fit'))
+
+PSQI.linear.fit <- read_rds(file =
+            here('Model fits',
+                 'Unmoderated',
+                 'PSQI.linear.fit'))
+
+```
+
+# Extract parameters
+
+## generic function
+
+```{r}
+
+extractParameters <- function(fit, outcomeName){
+  
+  broom::tidy(fit) %>%
+    mutate(outcome = outcomeName)
+  
+}
+
+```
+
+```{r}
+
+parameters <- 
+  
+  # extract all estimates
+  bind_rows(
+    extractParameters(
+      BPIseverity.piecewise.fit, 
+      'BPI Severity'),
+        extractParameters(
+      BPIinterference.piecewise.fit, 
+      'BPI Interference'),
+    extractParameters(
+      CPAQ.piecewise.fit, 
+      'CPAQ'),
+    extractParameters(
+      PHQ9.piecewise.fit, 
+      'PHQ9'),
+  extractParameters(
+      PSQI.linear.fit, 
+      'PSQI')) %>%
+
+    filter(term %in% c("myIntercept ~1 ", 
+                       "slope1 ~1 ",
+                       "slope2 ~1 ",
+                       "linearSlope ~1 ")) %>%
+  
+  # change term to more readable text
+  mutate(parameter = 
+           str_replace_all(term, 
+                           c("myIntercept ~1 " = "Intercept",
+                             "slope1 ~1 " = "Intervention Slope",
+                             "slope2 ~1 " = "FU Slope",
+                             "linearSlope ~1 " = "Linear Slope"))) %>%
+         
+  
+  # just keep columns of interest
+  select(outcome, parameter, estimate, std.error, p.value)
+
+```
+
+# Format table in kableExtra
+
+```{r}
+table <- parameters %>%
+  
+  # do rounding
+  mutate(across(.cols = estimate:std.error, .fns = round_tidy, digits = 2)) %>%
+  mutate(p.value =  round_tidy(p.value, digits = 3)) %>%
+
+  # drop outcome
+  select(-outcome) %>%
+  
+ # do kable
+  kable(col.names = c('Parameter','Estimate', 'SE','p')) %>%
+  kableExtra::group_rows(
+    group_label = 'Pain Severity (BPI)', start_row = 1, end_row = 3,italic = TRUE, bold = FALSE) %>%
+  kableExtra::group_rows(
+    group_label = 'Pain Interference (BPI)', start_row = 4, end_row = 6,italic = TRUE, bold = FALSE) %>%
+  kableExtra::group_rows(
+    group_label = 'Pain Acceptance (CPAQ)', start_row = 7, end_row = 9,italic = TRUE, bold = FALSE) %>%
+  kableExtra::group_rows(
+    group_label = 'Depression Symptoms (PHQ-9)', start_row = 10, end_row = 12,italic = TRUE, bold = FALSE) %>%
+  kableExtra::group_rows(
+    group_label = 'Sleep Quality (PSQI)', start_row = 13, end_row = 14,italic = TRUE, bold = FALSE) %>%
+  
+  kableExtra::kable_classic_2(html_font = 'Times New Roman')
+  
+
+
+table 
+```

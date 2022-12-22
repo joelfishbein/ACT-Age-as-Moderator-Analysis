@@ -12,7 +12,11 @@ library(here)
 library(tidyverse)
 
 data.allvars <- read_csv(here('TeleACT-Aging_Joel_9-16-22.csv')) %>%
-  mutate(ageMeanCentered = age - mean(age))
+  mutate(ageMeanCentered = age - mean(age),
+         ageCenteredAt35 = age-35,
+         ageCenteredAt45 = age-45,
+         ageCenteredAt55 = age-55,
+         ageCenteredAt65 = age-65)
 
 ```
 
