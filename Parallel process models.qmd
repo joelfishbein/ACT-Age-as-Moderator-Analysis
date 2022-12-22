@@ -59,13 +59,13 @@ bpiInterSlope2 =~ 0*BPIinterference.1 +
               2*BPIinterference.5              
 
 # regress factors on age (moderator)
-phqIntercept ~ ageMeanCentered
-phqSlope1 ~ ageMeanCentered
-phqSlope2 ~ ageMeanCentered
-
-bpiInterIntercept ~ ageMeanCentered
-bpiInterSlope1 ~ ageMeanCentered
-bpiInterSlope2 ~ ageMeanCentered
+# phqIntercept ~ ageMeanCentered
+# phqSlope1 ~ ageMeanCentered
+# phqSlope2 ~ ageMeanCentered
+# 
+# bpiInterIntercept ~ ageMeanCentered
+# bpiInterSlope1 ~ ageMeanCentered
+# bpiInterSlope2 ~ ageMeanCentered
 
 # slope covariances
 bpiInterSlope1 ~~ phqSlope1
@@ -82,11 +82,9 @@ phq9.BPI_Inter.parallel.fit <- lavaan::sem(model = phq9.BPI_Inter.parallel.model
                         data = data.wide,
                         missing = 'FIML')
 
-summary(phq9.BPI_Inter.parallel.fit, fit.measures = TRUE)
+summary(phq9.BPI_Inter.parallel.fit, fit.measures = TRUE, standardized = TRUE)
 
 
-semPlot::semPaths(phq9.BPI_Inter.parallel.fit, 
-                  layout = "tree2")
 ```
 
 # PHQ9 and BPI severity parallel process
@@ -133,13 +131,13 @@ bpiSevSlope2 =~ 0*BPIseverity.1 +
               2*BPIseverity.5              
 
 # regress factors on age (moderator)
-phqIntercept ~ ageMeanCentered
-phqSlope1 ~ ageMeanCentered
-phqSlope2 ~ ageMeanCentered
-
-bpiSevIntercept ~ ageMeanCentered
-bpiSevSlope1 ~ ageMeanCentered
-bpiSevSlope2 ~ ageMeanCentered
+# phqIntercept ~ ageMeanCentered
+# phqSlope1 ~ ageMeanCentered
+# phqSlope2 ~ ageMeanCentered
+# 
+# bpiSevIntercept ~ ageMeanCentered
+# bpiSevSlope1 ~ ageMeanCentered
+# bpiSevSlope2 ~ ageMeanCentered
 
 # slope covariances
 bpiSevSlope1 ~~ phqSlope1
@@ -156,8 +154,6 @@ phq9.BPI_Sev.parallel.fit <- lavaan::sem(model = phq9.BPI_Sev.parallel.model,
 summary(phq9.BPI_Sev.parallel.fit, fit.measures = TRUE)
 
 ```
-
-
 
 # BPI severity and BPI interference parallel process
 
@@ -184,11 +180,11 @@ bpiInterSlope1 =~ 0*BPIinterference.1 +
               2*BPIinterference.3            
 
 # regress factors on age (moderator)
-bpiSevIntercept ~ ageMeanCentered
-bpiSevSlope1 ~ ageMeanCentered
+# bpiSevIntercept ~ ageMeanCentered
+# bpiSevSlope1 ~ ageMeanCentered
 
-bpiInterIntercept ~ ageMeanCentered
-bpiInterSlope1 ~ ageMeanCentered
+# bpiInterIntercept ~ ageMeanCentered
+# bpiInterSlope1 ~ ageMeanCentered
 
 
 
