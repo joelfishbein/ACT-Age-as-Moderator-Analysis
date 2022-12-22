@@ -45,9 +45,7 @@ PSQI.linear.moderated.fit <- read_rds(file =
 
 ```
 
-
 # Extract parameters
-
 
 ## generic function
 
@@ -62,8 +60,6 @@ extractParameters <- function(fit, outcomeName){
 
 ```
 
-
-
 ```{r}
 
 parameters <- 
@@ -71,11 +67,11 @@ parameters <-
   # extract all estimates
   bind_rows(
     extractParameters(
-      BPIinterference.piecewise.moderated.fit, 
-      'BPI Interference'),
-    extractParameters(
       BPIseverity.piecewise.moderated.fit, 
       'BPI Severity'),
+        extractParameters(
+      BPIinterference.piecewise.moderated.fit, 
+      'BPI Interference'),
     extractParameters(
       CPAQ.piecewise.moderated.fit, 
       'CPAQ'),
@@ -113,7 +109,6 @@ parameters <-
 
 ```
 
-
 ```{r}
 
 parameters
@@ -135,9 +130,9 @@ table <- parameters %>%
  # do kable
   kable(col.names = c('Parameter','Estimate', 'SE','p')) %>%
   kableExtra::group_rows(
-    group_label = 'Pain Interference (BPI)', start_row = 1, end_row = 6,italic = TRUE, bold = FALSE) %>%
+    group_label = 'Pain Severity (BPI)', start_row = 1, end_row = 6,italic = TRUE, bold = FALSE) %>%
   kableExtra::group_rows(
-    group_label = 'Pain Severity (BPI)', start_row = 7, end_row = 12,italic = TRUE, bold = FALSE) %>%
+    group_label = 'Pain Interference (BPI)', start_row = 7, end_row = 12,italic = TRUE, bold = FALSE) %>%
   kableExtra::group_rows(
     group_label = 'Pain Acceptance (CPAQ)', start_row = 13, end_row = 18,italic = TRUE, bold = FALSE) %>%
   kableExtra::group_rows(
