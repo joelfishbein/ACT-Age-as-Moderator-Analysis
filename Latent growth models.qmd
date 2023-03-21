@@ -223,6 +223,24 @@ BPIseverity.centered55.fit <-
 BPIseverity.centered65.fit <-
   fitPiecewiseModeratedModel('BPIseverity', ageVar = 'ageCenteredAt65')
 
+
+write_rds(x = BPIseverity.centered35.fit, 
+          file = here('Model fits', 'Pick a point',
+                      'BPIseverity.centered35.fit'))
+
+
+write_rds(x = BPIseverity.centered45.fit, 
+          file = here('Model fits', 'Pick a point',
+                      'BPIseverity.centered45.fit'))
+
+write_rds(x = BPIseverity.centered55.fit, 
+          file = here('Model fits', 'Pick a point',
+                      'BPIseverity.centered55.fit'))
+
+write_rds(x = BPIseverity.centered65.fit, 
+          file = here('Model fits', 'Pick a point',
+                      'BPIseverity.centered65.fit'))
+
 ```
 
 ## Pain interference
@@ -279,6 +297,24 @@ BPIinterference.centered55.fit <-
 
 BPIinterference.centered65.fit <-
   fitPiecewiseModeratedModel('BPIinterference', ageVar = 'ageCenteredAt65')
+
+
+write_rds(x = BPIinterference.centered35.fit, 
+          file = here('Model fits', 'Pick a point',
+                      'BPIinterference.centered35.fit'))
+
+
+write_rds(x = BPIinterference.centered45.fit, 
+          file = here('Model fits', 'Pick a point',
+                      'BPIinterference.centered45.fit'))
+
+write_rds(x = BPIinterference.centered55.fit, 
+          file = here('Model fits', 'Pick a point',
+                      'BPIinterference.centered55.fit'))
+
+write_rds(x = BPIinterference.centered65.fit, 
+          file = here('Model fits', 'Pick a point',
+                      'BPIinterference.centered65.fit'))
 
 ```
 
