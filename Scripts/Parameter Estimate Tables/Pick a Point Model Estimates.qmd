@@ -16,56 +16,63 @@ library(finalfit)
 
 ```
 
-
 ```{r}
 
 BPIseverity.centered35.fit <- read_rds(file = 
             here('Model fits',
-                 'Moderated',
-                 'Pick-A-Point',
+                 "Pick a point",
+                 # 'Moderated',
+                 # 'Pick-A-Point',
                  'BPIseverity.centered35.fit'))
 
 BPIseverity.centered45.fit <- read_rds(file = 
             here('Model fits',
-                 'Moderated',
-                 'Pick-A-Point',
+                 "Pick a point",
+                 # 'Moderated',
+                 # 'Pick-A-Point',
                  'BPIseverity.centered45.fit'))
 
 BPIseverity.centered55.fit <- read_rds(file = 
             here('Model fits',
-                 'Moderated',
-                 'Pick-A-Point',
+                 "Pick a point",
+                 # 'Moderated',
+                 # 'Pick-A-Point',
                  'BPIseverity.centered55.fit'))
 
 BPIseverity.centered65.fit <- read_rds(file = 
             here('Model fits',
-                 'Moderated',
-                 'Pick-A-Point',
+                 "Pick a point",
+                 # 'Moderated',
+                 # 'Pick-A-Point',
                  'BPIseverity.centered65.fit'))
 
 
 BPIinterference.centered35.fit <- read_rds(file = 
             here('Model fits',
-                 'Moderated',
-                 'Pick-A-Point',
+                 "Pick a point",
+                 # 'Moderated',
+                 # 'Pick-A-Point',
                  'BPIinterference.centered35.fit'))
 
 BPIinterference.centered45.fit <- read_rds(file = 
             here('Model fits',
-                 'Moderated',
-                 'Pick-A-Point',
+                 "Pick a point",
+                 # 'Moderated',
+                 # 'Pick-A-Point',
                  'BPIinterference.centered45.fit'))
 
 BPIinterference.centered55.fit <- read_rds(file = 
             here('Model fits',
-                 'Moderated',
-                 'Pick-A-Point',
+                 "Pick a point",
+                 # 'Moderated',
+                 # 'Pick-A-Point',
                  'BPIinterference.centered55.fit'))
 
 BPIinterference.centered65.fit <- read_rds(file = 
             here('Model fits',
-                 'Moderated',
-                 'Pick-A-Point',
+                 "Pick a point",
+                 # 'Moderated',
+                 # 'Pick-A-Point',
                  'BPIinterference.centered65.fit'))
 ```
 
@@ -134,7 +141,11 @@ parameters <-
          
   
   # just keep columns of interest
-  select(outcome, age, parameter, estimate, std.error, p.value) %>%
+  select(outcome, age, parameter, estimate, std.error, p.value) 
+
+
+parameters.pretty <-
+  parameters %>%
   
     # do rounding
   mutate(across(.cols = estimate:std.error, .fns = round_tidy, digits = 2)) %>%
@@ -144,13 +155,13 @@ parameters <-
   
   pivot_wider(names_from = c("parameter","name"))
 
-parameters
+parameters.pretty
 
 ```
 
 ```{r}
 
-table <- parameters %>%
+table <- parameters.pretty %>%
   
 
 
@@ -172,4 +183,51 @@ table <- parameters %>%
 
 
 table
+```
+
+# Plot estimates
+
+```{r}
+
+projections.wide <-
+  parameters %>%
+ pivot_longer(estimate:p.value) %>%
+  pivot_wider(names_from = c("parameter","name")) %>%
+  mutate(`Post_estimate` = `Intercept_estimate` + `Intervention Slope_estimate`,
+         `FU_estimate` = `Post_estimate` + `FU Slope_estimate`)
+  
+
+projections.long <- 
+  projections.wide %>%
+  pivot_longer(`Intercept_estimate`:`FU_estimate`, 
+               names_to = c("Parameter", "Statistic"), 
+               names_sep = "_") %>%
+  filter(Statistic != "p.value") %>%
+  filter(Statistic != "std.error") %>%
+  filter(Parameter %in% c("Intercept","Post","FU")) %>%
+  mutate(Parameter = str_replace_all(Parameter,
+                                     c("Intercept" = "Pre-ACT",
+                                       "Post" = "Post-ACT",
+                                       "FU" = "Follow-up"))) %>%
+  mutate(Parameter = as_factor(Parameter),
+         Age = as_factor(age),
+         outcome = as_factor(outcome))
+
+```
+
+```{r}
+
+plot <- projections.long %>%
+  ggplot(aes(x = Parameter, y = value, color = Age, group = Age)) +
+  geom_point() +
+  geom_line() +
+  theme_bw() +
+  scale_color_grey(start=0.7, end=0.1) + 
+  xlab("Timepoint") +
+  ylab("") +
+  facet_wrap(vars(outcome)) +
+  ylim(5,8)
+
+
+ggsave(plot = plot, filename = here("Pick A Point Projections.jpg"),width = 6, height = 4, units = "in")
 ```
