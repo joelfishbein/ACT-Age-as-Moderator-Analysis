@@ -1,0 +1,59 @@
+---
+title: "Examine moderators"
+format: html
+editor: visual
+---
+
+Did we also assess age group differences on sociodemographics and baseline outcome variables? This is worth some attention in this manuscript and may indicate some posthoc analyses (e.g., if there are age differences in relationship status, income, etc.).
+
+```{r}
+library(here)
+library(lavaan)
+library(tidyverse)
+library(broom)
+data.wide <- read_csv(here('Generated Datasets', 'data_wide.rds'))
+```
+
+## Age by income
+
+```{r}
+
+
+data.wide %>%
+  ggplot(aes(x = age, y = Income)) +
+  geom_point()
+
+```
+
+```{r}
+
+age_income.fit <-
+  lm(formula = Income_Coded ~ age*age, data = data.wide)
+
+
+summary(age_income.fit)
+
+```
+
+## Age by relationship status
+
+```{r}
+
+
+data.wide %>%
+  ggplot(aes(x = age, y = Income)) +
+  geom_point() +
+  geom_smooth(mapping = aes(x = age, y = Income_Coded), method = "loess") +
+    geom_smooth(mapping = aes(x = age, y = Income_Coded), method = "lm", color = 'red')
+
+```
+
+```{r}
+
+age_income.fit <-
+  lm(formula = Income_Coded ~ age*age, data = data.wide)
+
+
+summary(age_income.fit)
+
+```

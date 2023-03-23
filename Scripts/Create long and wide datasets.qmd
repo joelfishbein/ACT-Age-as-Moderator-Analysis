@@ -56,9 +56,17 @@ data.wide <- data.allvars %>%
     starts_with(
       c("ID", "Telehealth", "age", "Age_Bi",
         "BPIinterference", "BPIseverity",
-        "CPAQ.", "CPAQ_Activities", "CPAQ_Willingness", "PHQ9", "PSQI")))
-
-colnames(data.wide)
+        "CPAQ.", "CPAQ_Activities", "CPAQ_Willingness", "PHQ9", "PSQI", "incomelevel", "Income_Coded",
+        "MaritalStatus_Coded"))) %>%
+  mutate(Income = factor(Income_Coded,
+                         levels = c(0:6),
+                         labels = c("Under $20K",
+                                    "$20-35K",
+                                    "$35K-50K",
+                                    "$50K-65K",
+                                    "$65K-80K",
+                                    "$80K-100K",
+                                    "100K+")))
 
 
 ```
