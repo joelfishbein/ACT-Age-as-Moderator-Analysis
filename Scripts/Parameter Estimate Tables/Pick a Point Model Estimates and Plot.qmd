@@ -1,7 +1,9 @@
 ---
-title: "Pick a Point Model Estimates"
+title: "Pick a Point Model Estimates and Plot"
 format: html
 editor: visual
+author: Joel N Fishbein, M.A.
+date: March 24, 2022
 ---
 
 # Read libraries and data
