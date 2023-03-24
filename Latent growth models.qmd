@@ -2,6 +2,8 @@
 title: "Latent growth models"
 format: html
 editor: visual
+author: Joel N Fishbein, M.A.
+date: March 24, 2022
 ---
 
 # Read in data
@@ -299,23 +301,6 @@ BPIinterference.centered65.fit <-
   fitPiecewiseModeratedModel('BPIinterference', ageVar = 'ageCenteredAt65')
 
 
-write_rds(x = BPIinterference.centered35.fit, 
-          file = here('Model fits', 'Pick a point',
-                      'BPIinterference.centered35.fit'))
-
-
-write_rds(x = BPIinterference.centered45.fit, 
-          file = here('Model fits', 'Pick a point',
-                      'BPIinterference.centered45.fit'))
-
-write_rds(x = BPIinterference.centered55.fit, 
-          file = here('Model fits', 'Pick a point',
-                      'BPIinterference.centered55.fit'))
-
-write_rds(x = BPIinterference.centered65.fit, 
-          file = here('Model fits', 'Pick a point',
-                      'BPIinterference.centered65.fit'))
-
 ```
 
 ## CPAQ total
@@ -441,91 +426,7 @@ summary(CPAQ.piecewise.moderated.fit, fit.measures = TRUE)
 
 ```
 
-## CPAQ Activities
-
-Piecewise is best fit, no age moderation effects
-
-### Linear
-
-```{r}
-
-CPAQ.linear.fit <- fitLinearModel('CPAQ_Activities')
-
-summary(CPAQ.linear.fit, fit.measures = TRUE)
-
-```
-
-### Piecewise
-
-```{r}
-
-CPAQ.piecewise.fit <- fitPiecewiseModel('CPAQ_Activities')
-
-summary(CPAQ.piecewise.fit, fit.measures = TRUE)
-
-```
-
-### Model comparison
-
-```{r}
-anova(CPAQ.linear.fit, CPAQ.piecewise.fit)
-
-```
-
-### Moderated piecewise
-
-```{r}
-
-CPAQ.piecewise.moderated.fit <- fitPiecewiseModeratedModel('CPAQ_Activities')
-
-summary(CPAQ.piecewise.moderated.fit, fit.measures = TRUE)
-
-```
-
-## CPAQ Willingness
-
-Piecewise is best fit though negative resid var at T5, no age moderation effects
-
-### Linear
-
-```{r}
-
-CPAQ.linear.fit <- fitLinearModel('CPAQ_Willingness')
-
-summary(CPAQ.linear.fit, fit.measures = TRUE)
-
-```
-
-### Piecewise
-
-```{r}
-
-CPAQ.piecewise.fit <- fitPiecewiseModel('CPAQ_Willingness')
-
-summary(CPAQ.piecewise.fit, fit.measures = TRUE)
-
-```
-
-### Model comparison
-
-```{r}
-anova(CPAQ.linear.fit, CPAQ.piecewise.fit)
-
-```
-
-### Moderated piecewise
-
-```{r}
-
-CPAQ.piecewise.moderated.fit <- fitPiecewiseModeratedModel('CPAQ_Willingness')
-
-summary(CPAQ.piecewise.moderated.fit, fit.measures = TRUE)
-
-```
-
 ## PHQ9
-
-Piecewise is best fit though negative resid var at T5, no age moderation effects
 
 ### Linear
 
@@ -561,67 +462,6 @@ anova(PHQ9.linear.fit, PHQ9.piecewise.fit)
 PHQ9.piecewise.moderated.fit <- fitPiecewiseModeratedModel('PHQ9')
 
 summary(PHQ9.piecewise.moderated.fit, fit.measures = TRUE)
-
-```
-
-# PSQI
-
-### Linear
-
-```{r}
-
-PSQI.linear.fit <- fitLinearModel('PSQI')
-
-summary(PSQI.linear.fit, fit.measures = TRUE)
-
-```
-
-### Piecewise
-
-```{r}
-
-PSQI.piecewise.fit <- fitPiecewiseModel('PSQI')
-
-summary(PSQI.piecewise.fit, fit.measures = TRUE)
-
-```
-
-### Model comparison
-
-```{r}
-anova(PSQI.linear.fit, PSQI.piecewise.fit)
-
-```
-
-### Moderated linear
-
-```{r}
-
-PSQI.linear.moderated.model <-'
-
-myIntercept =~ 1*PSQI.1 +
-              1*PSQI.2 +
-              1*PSQI.3 +
-              1*PSQI.4 +
-              1*PSQI.5
-              
-linearSlope =~ 0*PSQI.1 +
-              1*PSQI.2 +
-              2*PSQI.3 +
-              3*PSQI.4 +
-              4*PSQI.5
-              
-myIntercept ~ mIntercept*ageMeanCentered
-linearSlope ~ mSlope1*ageMeanCentered
-
-              
-'
-
-PSQI.linear.moderated.fit <- lavaan::growth(model = PSQI.linear.moderated.model,
-                        data = data.wide,
-                        missing = 'FIML')
-
-summary(PSQI.linear.moderated.fit, fit.measures = TRUE)
 
 ```
 
@@ -673,6 +513,7 @@ write_rds(x = BPIseverity.piecewise.moderated.fit,file =
                  'Moderated',
                  'BPIseverity.piecewise.moderated.fit'))
 
+# CPAQ piecewise moderated model is a model with T5 residual variance set to zero. See above where this model is run.
 write_rds(x = CPAQ.piecewise.moderated.fit,file = 
             here('Model fits',
                  'Moderated',
