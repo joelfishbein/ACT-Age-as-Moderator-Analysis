@@ -2,6 +2,8 @@
 title: "Age Plot"
 format: html
 editor: visual
+author: Joel N Fishbein, M.A.
+date: March 24, 2022
 ---
 
 ```{r}
@@ -10,23 +12,6 @@ library(ggdist)
 library(tidyverse)
 
 data.wide <- read_csv(here('Generated Datasets', 'data_wide.rds'))
-
-
-```
-
-```{r}
-
-
-  summary(data.wide$age)
-
-```
-
-```{r}
-
-data.wide %>%
-  ggplot(aes(x = age)) +
-  geom_dotplot() +
-  theme_bw()
 
 
 ```
