@@ -1,5 +1,5 @@
 ---
-title: "Explore data"
+title: "Create long and wide datasets"
 format: html
 editor: visual
 author: Joel N Fishbein, M.A.
@@ -21,31 +21,6 @@ data.allvars <- read_csv(here('TeleACT-Aging_Joel_9-16-22.csv')) %>%
 
 ```
 
-# Examine variables of interest
-
--   ID - participant ID
-
--   Telehealth: participant's randomized condition assignment of Telehealth ( = ?) vs in -person ACT (= ?)
-
--   age - age at baseline in years?
-
--   Age_Bi: age variable dichotomized by Matt at age ??
-
--   BPIinterference.1-BPIinterference.5: pain interference
-
--   BPIseverity.1 - BPIseverity.5: pain severity
-
--   CPAQ.1-CPAQ.5: chronic pain acceptance total score?
-
--   CPAQ_Activities.1-CPAC_Activities.5: chronic pain acceptance activities score?
-
--   CPAQ_Willingness.1-CPAC_Willingness.5: chronic pain acceptance activities score?
-
-```{r}
-
-colnames(data.allvars)
-```
-
 # Select variables to examine
 
 ```{r}
@@ -57,7 +32,7 @@ data.wide <- data.allvars %>%
     starts_with(
       c("ID", "Telehealth", "age", "Age_Bi",
         "BPIinterference", "BPIseverity",
-        "CPAQ.", "CPAQ_Activities", "CPAQ_Willingness", "PHQ9", "PSQI", "incomelevel", "Income_Coded",
+        "CPAQ.", "CPAQ_Activities", "CPAQ_Willingness", "PHQ9",  "incomelevel", "Income_Coded",
         "MaritalStatus_Coded"))) %>%
   mutate(Income = factor(Income_Coded,
                          levels = c(0:6),
