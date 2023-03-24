@@ -8,8 +8,10 @@ date: March 24, 2022
 
 # Read libraries and data
 
-```{r}
+# Read libraries and data
 
+```{r}
+library(here)
 library(tidyverse)
 library(broom)
 library(lavaan)
@@ -146,6 +148,13 @@ parameters <-
   select(outcome, age, parameter, estimate, std.error, p.value) 
 
 
+
+```
+
+# Make table
+
+```{r}
+
 parameters.pretty <-
   parameters %>%
   
@@ -157,16 +166,9 @@ parameters.pretty <-
   
   pivot_wider(names_from = c("parameter","name"))
 
-parameters.pretty
 
-```
-
-```{r}
 
 table <- parameters.pretty %>%
-  
-
-
   # drop outcome
   select(-outcome) %>%
   
@@ -195,8 +197,12 @@ projections.wide <-
   parameters %>%
  pivot_longer(estimate:p.value) %>%
   pivot_wider(names_from = c("parameter","name")) %>%
-  mutate(`Post_estimate` = `Intercept_estimate` + `Intervention Slope_estimate`,
-         `FU_estimate` = `Post_estimate` + `FU Slope_estimate`)
+  
+  # multiply by 2 to get Post and FU estimates given coding of slope as one unit per elapsed timepoint, and each slope is over 3 timepoints
+  mutate(`Post_estimate` = `Intercept_estimate` + 2*`Intervention Slope_estimate`,
+           
+         `FU_estimate` = `Post_estimate` + 2*`FU Slope_estimate`) %>%
+  select(outcome, age, Intercept_estimate, Post_estimate, FU_estimate)
   
 
 projections.long <- 
@@ -225,10 +231,10 @@ plot <- projections.long %>%
   geom_line() +
   theme_bw() +
   scale_color_grey(start=0.7, end=0.1) + 
-  xlab("Timepoint") +
+  xlab("") +
   ylab("") +
   facet_wrap(vars(outcome)) +
-  ylim(5,8)
+  ylim(4,7)
 
 
 ggsave(plot = plot, filename = here("Pick A Point Projections.jpg"),width = 6, height = 4, units = "in")
