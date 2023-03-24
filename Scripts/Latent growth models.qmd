@@ -12,7 +12,6 @@ date: March 24, 2022
 library(here)
 library(lavaan)
 library(tidyverse)
-library(broom)
 data.wide <- read_csv(here('Generated Datasets', 'data_wide.rds'))
 ```
 
@@ -491,10 +490,6 @@ write_rds(x = PHQ9.piecewise.fit,file =
                  'Unmoderated',
                  'PHQ9.piecewise.fit'))
 
-write_rds(x = PSQI.linear.fit,file = 
-            here('Model fits',
-                 'Unmoderated',
-                 'PSQI.linear.fit'))
 
 
 ```
@@ -523,11 +518,6 @@ write_rds(x = PHQ9.piecewise.moderated.fit,file =
             here('Model fits',
                  'Moderated',
                  'PHQ9.piecewise.moderated.fit'))
-
-write_rds(x = PSQI.linear.moderated.fit,file = 
-            here('Model fits',
-                 'Moderated',
-                 'PSQI.linear.moderated.fit'))
 
 
 ```

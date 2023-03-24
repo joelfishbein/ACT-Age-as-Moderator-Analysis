@@ -44,11 +44,6 @@ PHQ9.piecewise.moderated.fit <- read_rds(file =
                  'Moderated',
                  'PHQ9.piecewise.moderated.fit'))
 
-PSQI.linear.moderated.fit <- read_rds(file = 
-            here('Model fits',
-                 'Moderated',
-                 'PSQI.linear.moderated.fit'))
-
 BPIinterference.piecewise.fit <- read_rds(file = 
 
             here('Model fits',
@@ -81,13 +76,6 @@ PHQ9.piecewise.fit <- read_rds(file =
 
                  'PHQ9.piecewise.fit'))
 
-PSQI.linear.fit <- read_rds(file =
-
-            here('Model fits',
-
-                 'Unmoderated',
-
-                 'PSQI.linear.fit'))
 
 
 ```
@@ -126,9 +114,6 @@ fitIndices <-
     extractFitIndices(
       PHQ9.piecewise.fit, 
       'PHQ9'),
-  extractFitIndices(
-      PSQI.linear.fit, 
-      'PSQI'),
 
 extractFitIndices(
       BPIinterference.piecewise.moderated.fit, 
@@ -141,13 +126,10 @@ extractFitIndices(
       'CPAQ', moderated = TRUE),
     extractFitIndices(
       PHQ9.piecewise.moderated.fit, 
-      'PHQ9', moderated = TRUE),
-  extractFitIndices(
-      PSQI.linear.moderated.fit, 
-      'PSQI', moderated = TRUE)) %>%
+      'PHQ9', moderated = TRUE))%>%
   
-  mutate(df = c(6, 6, 7, 6, 10,
-                8, 8, 9, 8, 12)) %>%
+  mutate(df = c(6, 6, 7, 6,
+                8, 8, 9, 8)) %>%
   select('moderated', 'outcome',chisq,df,'cfi','srmr','rmsea') %>%
 
   mutate(across(chisq, round_tidy, 3)) %>%
@@ -174,11 +156,11 @@ table <- fitIndices %>%
 
   kableExtra::group_rows(
 
-    group_label = 'Unmoderated', start_row = 1, end_row = 5,italic = TRUE, bold = FALSE) %>%
+    group_label = 'Unmoderated', start_row = 1, end_row = 4,italic = TRUE, bold = FALSE) %>%
 
   kableExtra::group_rows(
 
-    group_label = 'Moderated', start_row = 6, end_row = 10,italic = TRUE, bold = FALSE) %>%
+    group_label = 'Moderated', start_row = 5, end_row = 8,italic = TRUE, bold = FALSE) %>%
 
   kableExtra::kable_classic_2(html_font = 'Times New Roman')
 

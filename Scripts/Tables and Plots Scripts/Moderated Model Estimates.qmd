@@ -40,10 +40,6 @@ PHQ9.piecewise.moderated.fit <- read_rds(file =
                  'Moderated',
                  'PHQ9.piecewise.moderated.fit'))
 
-PSQI.linear.moderated.fit <- read_rds(file = 
-            here('Model fits',
-                 'Moderated',
-                 'PSQI.linear.moderated.fit'))
 
 ```
 
@@ -79,10 +75,7 @@ parameters <-
       'CPAQ'),
     extractParameters(
       PHQ9.piecewise.moderated.fit, 
-      'PHQ9'),
-  extractParameters(
-      PSQI.linear.moderated.fit, 
-      'PSQI')) %>%
+      'PHQ9')) %>%
 
     filter(term %in% c("myIntercept ~1 ", 
                        "slope1 ~1 ",
@@ -139,9 +132,7 @@ table <- parameters %>%
     group_label = 'Pain Acceptance (CPAQ)', start_row = 13, end_row = 18,italic = TRUE, bold = FALSE) %>%
   kableExtra::group_rows(
     group_label = 'Depression Symptoms (PHQ-9)', start_row = 19, end_row = 24,italic = TRUE, bold = FALSE) %>%
-  kableExtra::group_rows(
-    group_label = 'Sleep Quality (PSQI)', start_row = 25, end_row = 28,italic = TRUE, bold = FALSE) %>%
-  
+
   kableExtra::kable_classic_2(html_font = 'Times New Roman')
   
 
