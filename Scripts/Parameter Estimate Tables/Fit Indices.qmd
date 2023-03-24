@@ -2,6 +2,8 @@
 title: "Fit Indices"
 format: html
 editor: visual
+author: Joel N Fishbein, M.A.
+date: March 24, 2022
 ---
 
 Note: p values associated with the Chi Sq test cannot be read in from broom::augment, thus I filled those by hand in MS Word.
@@ -185,5 +187,3 @@ table <- fitIndices %>%
 table 
 
 ```
-
-
