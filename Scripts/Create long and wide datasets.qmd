@@ -2,7 +2,6 @@
 title: "Create long and wide datasets"
 format: html
 editor: visual
-author: Joel N Fishbein, M.A.
 date: March 24, 2022
 ---
 
