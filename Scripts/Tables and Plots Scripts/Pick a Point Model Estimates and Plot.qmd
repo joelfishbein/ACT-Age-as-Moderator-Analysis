@@ -2,11 +2,8 @@
 title: "Pick a Point Model Estimates and Plot"
 format: html
 editor: visual
-author: Joel N Fishbein, M.A.
 date: March 24, 2022
 ---
-
-# Read libraries and data
 
 # Read libraries and data
 
@@ -25,58 +22,42 @@ library(finalfit)
 BPIseverity.centered35.fit <- read_rds(file = 
             here('Model fits',
                  "Pick a point",
-                 # 'Moderated',
-                 # 'Pick-A-Point',
                  'BPIseverity.centered35.fit'))
 
 BPIseverity.centered45.fit <- read_rds(file = 
             here('Model fits',
                  "Pick a point",
-                 # 'Moderated',
-                 # 'Pick-A-Point',
                  'BPIseverity.centered45.fit'))
 
 BPIseverity.centered55.fit <- read_rds(file = 
             here('Model fits',
                  "Pick a point",
-                 # 'Moderated',
-                 # 'Pick-A-Point',
                  'BPIseverity.centered55.fit'))
 
 BPIseverity.centered65.fit <- read_rds(file = 
             here('Model fits',
                  "Pick a point",
-                 # 'Moderated',
-                 # 'Pick-A-Point',
                  'BPIseverity.centered65.fit'))
 
 
 BPIinterference.centered35.fit <- read_rds(file = 
             here('Model fits',
                  "Pick a point",
-                 # 'Moderated',
-                 # 'Pick-A-Point',
                  'BPIinterference.centered35.fit'))
 
 BPIinterference.centered45.fit <- read_rds(file = 
             here('Model fits',
                  "Pick a point",
-                 # 'Moderated',
-                 # 'Pick-A-Point',
                  'BPIinterference.centered45.fit'))
 
 BPIinterference.centered55.fit <- read_rds(file = 
             here('Model fits',
                  "Pick a point",
-                 # 'Moderated',
-                 # 'Pick-A-Point',
                  'BPIinterference.centered55.fit'))
 
 BPIinterference.centered65.fit <- read_rds(file = 
             here('Model fits',
                  "Pick a point",
-                 # 'Moderated',
-                 # 'Pick-A-Point',
                  'BPIinterference.centered65.fit'))
 ```
 
