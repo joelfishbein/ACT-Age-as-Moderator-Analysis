@@ -1,0 +1,290 @@
+---
+title: "Plots for Judd Symposium Poster"
+format: html
+editor: visual
+---
+
+Generating plots for the Judd Symposium poster
+
+Here I run pick-a-point models on Pain Acceptance and Depression SOLELY FOR THE PURPOSE of getting the plots. These models will not be presented in text.
+
+# Read in data
+
+```{r}
+library(here)
+library(lavaan)
+library(tidyverse)
+data.wide <- read_csv(here('Generated Datasets', 'data_wide.rds'))
+```
+
+# Generic model functions
+
+
+```{r}
+
+piecewise.model.moderated.generic <- '
+
+myIntercept =~ 1*Var.1 +
+              1*Var.2 +
+              1*Var.3 +
+              1*Var.4 +
+              1*Var.5
+              
+slope1 =~ 0*Var.1 +
+              1*Var.2 +
+              2*Var.3 +
+              2*Var.4 +
+              2*Var.5
+              
+slope2 =~ 0*Var.1 +
+              0*Var.2 +
+              0*Var.3 +
+              1*Var.4 +
+              2*Var.5
+
+slope1 ~~ slope1Sigma2*slope1
+slope2 ~~ slope2Sigma2*slope2
+              
+myIntercept ~ mIntercept*ageGeneric
+slope1 ~ mSlope1*ageGeneric
+slope2 ~ mSlope2*ageGeneric
+
+ageES_slope1 := mSlope1/sqrt(slope1Sigma2)
+ageES_slope2 := mSlope2/sqrt(slope2Sigma2)
+
+              
+'
+
+fitPiecewiseModeratedModel <- function(instrumentName, 
+                                       ageVar = "ageMeanCentered" ){
+  # input instrumentName as argument
+  
+  
+  model <- str_replace_all(piecewise.model.moderated.generic, c("Var" = instrumentName,
+                                                                "ageGeneric" = ageVar))
+  
+  fit <- lavaan::growth(model = model,
+                        data = data.wide,
+                        missing = 'FIML')
+  
+  return(fit)
+  
+}
+
+```
+
+# Fit models to data
+
+```{r}
+
+BPIinterference.centered35.fit <-
+  fitPiecewiseModeratedModel('BPIinterference', ageVar = 'ageCenteredAt35')
+
+BPIinterference.centered45.fit <-
+  fitPiecewiseModeratedModel('BPIinterference', ageVar = 'ageCenteredAt45')
+
+BPIinterference.centered55.fit <-
+  fitPiecewiseModeratedModel('BPIinterference', ageVar = 'ageCenteredAt55')
+
+BPIinterference.centered65.fit <-
+  fitPiecewiseModeratedModel('BPIinterference', ageVar = 'ageCenteredAt65')
+
+BPIseverity.centered35.fit <-
+  fitPiecewiseModeratedModel('BPIseverity', ageVar = 'ageCenteredAt35')
+
+BPIseverity.centered45.fit <-
+  fitPiecewiseModeratedModel('BPIseverity', ageVar = 'ageCenteredAt45')
+
+BPIseverity.centered55.fit <-
+  fitPiecewiseModeratedModel('BPIseverity', ageVar = 'ageCenteredAt55')
+
+BPIseverity.centered65.fit <-
+  fitPiecewiseModeratedModel('BPIseverity', ageVar = 'ageCenteredAt65')
+
+PHQ9.centered35.fit <-
+  fitPiecewiseModeratedModel('PHQ9', ageVar = 'ageCenteredAt35')
+
+PHQ9.centered45.fit <-
+  fitPiecewiseModeratedModel('PHQ9', ageVar = 'ageCenteredAt45')
+
+PHQ9.centered55.fit <-
+  fitPiecewiseModeratedModel('PHQ9', ageVar = 'ageCenteredAt55')
+
+PHQ9.centered65.fit <-
+  fitPiecewiseModeratedModel('PHQ9', ageVar = 'ageCenteredAt65')
+
+CPAQ.centered35.fit <-
+  fitPiecewiseModeratedModel('CPAQ', ageVar = 'ageCenteredAt35')
+
+CPAQ.centered45.fit <-
+  fitPiecewiseModeratedModel('CPAQ', ageVar = 'ageCenteredAt45')
+
+CPAQ.centered55.fit <-
+  fitPiecewiseModeratedModel('CPAQ', ageVar = 'ageCenteredAt55')
+
+CPAQ.centered65.fit <-
+  fitPiecewiseModeratedModel('CPAQ', ageVar = 'ageCenteredAt65')
+
+```
+
+```{r}
+
+extractParameters <- function(fit, outcomeName, age){
+  
+  broom::tidy(fit) %>%
+    mutate(outcome = outcomeName,
+           age = age)
+  
+}
+
+```
+
+# Extract estimates
+
+```{r}
+
+
+parameters <- 
+  
+  # extract all estimates
+  bind_rows(
+    extractParameters(fit = BPIseverity.centered35.fit,
+                'Pain Severity (BPI)',
+                age = 35),
+    extractParameters(fit = BPIseverity.centered45.fit,
+                'Pain Severity (BPI)',
+                age = 45),
+    extractParameters(fit = BPIseverity.centered55.fit,
+                'Pain Severity (BPI)',
+                age = 55),
+    extractParameters(fit = BPIseverity.centered65.fit,
+                'Pain Severity (BPI)',
+                age = 65),
+
+     extractParameters(fit = BPIinterference.centered35.fit,
+                'Pain Interference (BPI)',
+                age = 35),
+    extractParameters(fit = BPIinterference.centered45.fit,
+                'Pain Interference (BPI)',
+                age = 45),
+    extractParameters(fit = BPIinterference.centered55.fit,
+                'Pain Interference (BPI)',
+                age = 55),
+    extractParameters(fit = BPIinterference.centered65.fit,
+                'Pain Interference (BPI)',
+                age = 65),
+    
+    extractParameters(fit = CPAQ.centered35.fit,
+                'Pain Acceptance (CPAQ)',
+                age = 35),
+    extractParameters(fit = CPAQ.centered45.fit,
+                'Pain Acceptance (CPAQ)',
+                age = 45),
+    extractParameters(fit = CPAQ.centered55.fit,
+                'Pain Acceptance (CPAQ)',
+                age = 55),
+    extractParameters(fit = CPAQ.centered65.fit,
+                'Pain Acceptance (CPAQ)',
+                age = 65),
+    
+    extractParameters(fit = PHQ9.centered35.fit,
+                'Depression Symptoms (PHQ-9)',
+                age = 35),
+    extractParameters(fit = PHQ9.centered45.fit,
+                'Depression Symptoms (PHQ-9)',
+                age = 45),
+    extractParameters(fit = PHQ9.centered55.fit,
+                'Depression Symptoms (PHQ-9)',
+                age = 55),
+    extractParameters(fit = PHQ9.centered65.fit,
+                'Depression Symptoms (PHQ-9)',
+                age = 65)) %>% 
+    
+
+    filter(term %in% c("myIntercept ~1 ", 
+                       "slope1 ~1 ",
+                       "slope2 ~1 ")) %>%
+  
+  # change term to more readable text
+  mutate(parameter = 
+           str_replace_all(term, 
+                           c("myIntercept ~1 " = "Intercept",
+                             "slope1 ~1 " = "Intervention Slope",
+                             "slope2 ~1 " = "FU Slope"))) %>%
+         
+  
+  # just keep columns of interest
+  select(outcome, age, parameter, estimate, std.error, p.value) 
+
+
+```
+
+```{r}
+
+projections.wide <-
+  parameters %>%
+ pivot_longer(estimate:p.value) %>%
+  pivot_wider(names_from = c("parameter","name")) %>%
+  
+  # multiply by 2 to get Post and FU estimates given coding of slope as one unit per elapsed timepoint, and each slope is over 3 timepoints
+  mutate(`Post_estimate` = `Intercept_estimate` + 2*`Intervention Slope_estimate`,
+           
+         `FU_estimate` = `Post_estimate` + 2*`FU Slope_estimate`) %>%
+  select(outcome, age, Intercept_estimate, Post_estimate, FU_estimate)
+  
+
+projections.long <- 
+  projections.wide %>%
+  pivot_longer(`Intercept_estimate`:`FU_estimate`, 
+               names_to = c("Parameter", "Statistic"), 
+               names_sep = "_") %>%
+  filter(Statistic != "p.value") %>%
+  filter(Statistic != "std.error") %>%
+  filter(Parameter %in% c("Intercept","Post","FU")) %>%
+  mutate(Parameter = str_replace_all(Parameter,
+                                     c("Intercept" = "Pre-ACT",
+                                       "Post" = "Post-ACT",
+                                       "FU" = "Follow-up"))) %>%
+  mutate(Parameter = as_factor(Parameter),
+         Age = as_factor(age),
+         outcome = as_factor(outcome))
+
+```
+
+```{r}
+
+plot <- projections.long %>%
+  ggplot(aes(x = Parameter, y = value, color = Age, group = Age)) +
+  geom_point(size = 3) +
+  geom_line(linewidth = 2) +
+    #scale_color_brewer(palette = "Blues", direction = 1) + 
+  scale_color_manual(values=c(
+    "#1E90FF",
+    "#4169E1",
+    "#0000CD",
+    "#191970")) +
+  ggthemes::theme_few() +
+ 
+  #scale_colour_steps() +
+  #scale_color_binned(start=0.7, end=0.1) + 
+  xlab("") +
+  ylab("") +
+  theme(text = element_text(size = 25)) +
+  facet_wrap(vars(outcome), scales = "free") +
+  theme(plot.margin = unit(c(0,0,0,0), "cm"))
+
+
+```
+
+```{r}
+plot
+
+```
+
+
+```{r}
+
+ggsave(plot = plot, filename = here("Plot for Poster.jpg"),
+       #width = 3, height = 1, dpi = 300,  units = "in")
+       width = 4032, height = 1800, dpi = 300, units = "px")
+```
