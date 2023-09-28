@@ -95,16 +95,16 @@ parameters <-
   # extract all estimates
   bind_rows(
     extractParameters(fit = BPIseverity.centered35.fit,
-                'Pain Severity (BPI)',
+                'Pain intensity (BPI)',
                 age = 35),
     extractParameters(fit = BPIseverity.centered45.fit,
-                'Pain Severity (BPI)',
+                'Pain intensity (BPI)',
                 age = 45),
     extractParameters(fit = BPIseverity.centered55.fit,
-                'Pain Severity (BPI)',
+                'Pain intensity (BPI)',
                 age = 55),
     extractParameters(fit = BPIseverity.centered65.fit,
-                'Pain Severity (BPI)',
+                'Pain intensity (BPI)',
                 age = 65),
 
      extractParameters(fit = BPIinterference.centered35.fit,
@@ -176,7 +176,7 @@ table <- parameters.pretty %>%
                                "Intervention Slope" = 3,
                                "FU Slope" = 3)) %>%
   kableExtra::group_rows(
-    group_label = 'Pain Severity (BPI)', start_row = 1, end_row = 4,italic = TRUE, bold = FALSE) %>%
+    group_label = 'Pain Intensity (BPI)', start_row = 1, end_row = 4,italic = TRUE, bold = FALSE) %>%
   kableExtra::group_rows(
     group_label = 'Pain Interference (BPI)', start_row = 5, end_row = 8, italic = TRUE, bold = FALSE) %>%
   
